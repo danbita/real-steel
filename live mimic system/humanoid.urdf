@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<!-- ==========================================================================
+     humanoid.urdf  —  a minimal walking figure
+     ==========================================================================
+     Structure (all hinges rotate about the Y axis = forward/back swing):
+
+       torso (root, held fixed in the air like a treadmill harness)
+        |-- L_shoulder -> L_uparm -- L_elbow -> L_forearm      (left arm)
+        |-- R_shoulder -> R_uparm -- R_elbow -> R_forearm      (right arm)
+        |-- L_hip      -> L_thigh -- L_knee  -> L_shin         (left leg)
+        |-- R_hip      -> R_thigh -- R_knee  -> R_shin         (right leg)
+
+     Anatomically correct one-way joints:
+       * knees flex so the shin folds BACKWARD (lower=0)  -> can't bend forward
+       * elbows flex so the forearm folds FORWARD (axis flipped, lower=0)
+     Left limbs are blue, right limbs are orange, so you can tell them apart.
+     ========================================================================== -->
+<robot name="humanoid">
+
+  <!-- ============================ TORSO (root) ============================ -->
+  <link name="torso">
+    <visual>
+      <geometry><box size="0.20 0.34 0.65"/></geometry>
+      <origin xyz="0 0 0.325"/>
+      <material name="gray"><color rgba="0.45 0.47 0.52 1"/></material>
+    </visual>
+    <collision><geometry><box size="0.20 0.34 0.65"/></geometry><origin xyz="0 0 0.325"/></collision>
+    <inertial><mass value="8.0"/><inertia ixx="0.1" iyy="0.1" izz="0.05" ixy="0" ixz="0" iyz="0"/></inertial>
+    <!-- a small head, just so it reads as a person -->
+    <visual>
+      <geometry><sphere radius="0.11"/></geometry>
+      <origin xyz="0 0 0.78"/>
+      <material name="tan"><color rgba="0.85 0.72 0.6 1"/></material>
+    </visual>
+  </link>
+
+  <!-- ============================== LEFT ARM ============================== -->
+  <joint name="L_shoulder" type="revolute">
+    <parent link="torso"/><child link="L_uparm"/>
+    <origin xyz="0 0.20 0.6"/><axis xyz="0 1 0"/>
+    <limit lower="-1.5" upper="1.5" effort="30" velocity="6"/>
+  </joint>
+  <link name="L_uparm">
+    <visual><geometry><box size="0.06 0.06 0.30"/></geometry><origin xyz="0 0 -0.15"/>
+      <material name="blue"><color rgba="0.2 0.5 0.9 1"/></material></visual>
+    <collision><geometry><box size="0.06 0.06 0.30"/></geometry><origin xyz="0 0 -0.15"/></collision>
+    <inertial><mass value="0.8"/><origin xyz="0 0 -0.15"/><inertia ixx="0.006" iyy="0.006" izz="0.001" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <!-- elbow axis flipped (0 -1 0) so positive angle bends the forearm FORWARD -->
+  <joint name="L_elbow" type="revolute">
+    <parent link="L_uparm"/><child link="L_forearm"/>
+    <origin xyz="0 0 -0.30"/><axis xyz="0 -1 0"/>
+    <limit lower="0" upper="2.5" effort="30" velocity="6"/>
+  </joint>
+  <link name="L_forearm">
+    <visual><geometry><box size="0.05 0.05 0.28"/></geometry><origin xyz="0 0 -0.14"/>
+      <material name="blue"/></visual>
+    <collision><geometry><box size="0.05 0.05 0.28"/></geometry><origin xyz="0 0 -0.14"/></collision>
+    <inertial><mass value="0.6"/><origin xyz="0 0 -0.14"/><inertia ixx="0.004" iyy="0.004" izz="0.001" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+
+  <!-- ============================= RIGHT ARM ============================= -->
+  <joint name="R_shoulder" type="revolute">
+    <parent link="torso"/><child link="R_uparm"/>
+    <origin xyz="0 -0.20 0.6"/><axis xyz="0 1 0"/>
+    <limit lower="-1.5" upper="1.5" effort="30" velocity="6"/>
+  </joint>
+  <link name="R_uparm">
+    <visual><geometry><box size="0.06 0.06 0.30"/></geometry><origin xyz="0 0 -0.15"/>
+      <material name="orange"><color rgba="0.95 0.55 0.2 1"/></material></visual>
+    <collision><geometry><box size="0.06 0.06 0.30"/></geometry><origin xyz="0 0 -0.15"/></collision>
+    <inertial><mass value="0.8"/><origin xyz="0 0 -0.15"/><inertia ixx="0.006" iyy="0.006" izz="0.001" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <joint name="R_elbow" type="revolute">
+    <parent link="R_uparm"/><child link="R_forearm"/>
+    <origin xyz="0 0 -0.30"/><axis xyz="0 -1 0"/>
+    <limit lower="0" upper="2.5" effort="30" velocity="6"/>
+  </joint>
+  <link name="R_forearm">
+    <visual><geometry><box size="0.05 0.05 0.28"/></geometry><origin xyz="0 0 -0.14"/>
+      <material name="orange"/></visual>
+    <collision><geometry><box size="0.05 0.05 0.28"/></geometry><origin xyz="0 0 -0.14"/></collision>
+    <inertial><mass value="0.6"/><origin xyz="0 0 -0.14"/><inertia ixx="0.004" iyy="0.004" izz="0.001" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+
+  <!-- ============================== LEFT LEG ============================== -->
+  <joint name="L_hip" type="revolute">
+    <parent link="torso"/><child link="L_thigh"/>
+    <origin xyz="0 0.10 0"/><axis xyz="0 1 0"/>
+    <limit lower="-1.2" upper="1.2" effort="80" velocity="6"/>
+  </joint>
+  <link name="L_thigh">
+    <visual><geometry><box size="0.09 0.09 0.40"/></geometry><origin xyz="0 0 -0.20"/>
+      <material name="blue"/></visual>
+    <collision><geometry><box size="0.09 0.09 0.40"/></geometry><origin xyz="0 0 -0.20"/></collision>
+    <inertial><mass value="1.5"/><origin xyz="0 0 -0.20"/><inertia ixx="0.02" iyy="0.02" izz="0.003" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <!-- knee axis (0 1 0): positive angle folds the shin BACKWARD (real knee) -->
+  <joint name="L_knee" type="revolute">
+    <parent link="L_thigh"/><child link="L_shin"/>
+    <origin xyz="0 0 -0.40"/><axis xyz="0 1 0"/>
+    <limit lower="0" upper="2.4" effort="80" velocity="6"/>
+  </joint>
+  <link name="L_shin">
+    <visual><geometry><box size="0.07 0.07 0.40"/></geometry><origin xyz="0 0 -0.20"/>
+      <material name="blue"/></visual>
+    <collision><geometry><box size="0.07 0.07 0.40"/></geometry><origin xyz="0 0 -0.20"/></collision>
+    <inertial><mass value="1.0"/><origin xyz="0 0 -0.20"/><inertia ixx="0.014" iyy="0.014" izz="0.002" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+
+  <!-- ============================= RIGHT LEG ============================= -->
+  <joint name="R_hip" type="revolute">
+    <parent link="torso"/><child link="R_thigh"/>
+    <origin xyz="0 -0.10 0"/><axis xyz="0 1 0"/>
+    <limit lower="-1.2" upper="1.2" effort="80" velocity="6"/>
+  </joint>
+  <link name="R_thigh">
+    <visual><geometry><box size="0.09 0.09 0.40"/></geometry><origin xyz="0 0 -0.20"/>
+      <material name="orange"/></visual>
+    <collision><geometry><box size="0.09 0.09 0.40"/></geometry><origin xyz="0 0 -0.20"/></collision>
+    <inertial><mass value="1.5"/><origin xyz="0 0 -0.20"/><inertia ixx="0.02" iyy="0.02" izz="0.003" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <joint name="R_knee" type="revolute">
+    <parent link="R_thigh"/><child link="R_shin"/>
+    <origin xyz="0 0 -0.40"/><axis xyz="0 1 0"/>
+    <limit lower="0" upper="2.4" effort="80" velocity="6"/>
+  </joint>
+  <link name="R_shin">
+    <visual><geometry><box size="0.07 0.07 0.40"/></geometry><origin xyz="0 0 -0.20"/>
+      <material name="orange"/></visual>
+    <collision><geometry><box size="0.07 0.07 0.40"/></geometry><origin xyz="0 0 -0.20"/></collision>
+    <inertial><mass value="1.0"/><origin xyz="0 0 -0.20"/><inertia ixx="0.014" iyy="0.014" izz="0.002" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+
+</robot>

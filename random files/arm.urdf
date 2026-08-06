@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<!-- ==========================================================================
+     arm.urdf  —  a minimal 2-joint robot arm
+     ==========================================================================
+     A URDF ("Unified Robot Description Format") is just an XML file that
+     describes a robot as a tree of LINKS (rigid bodies) connected by JOINTS
+     (the movable connections between them).
+
+     This arm has:
+       base_link      -> a fixed pedestal sitting on the ground
+       shoulder joint -> revolute (rotating) joint, THIS is the one we swing
+       upper_arm      -> the first arm segment
+       elbow joint    -> a second revolute joint (held still for now)
+       forearm        -> the second arm segment
+
+     Every <link> has:
+       <visual>    what it looks like
+       <collision> its physical shape for the physics engine
+       <inertial>  its mass + how that mass is distributed
+     ========================================================================== -->
+<robot name="simple_arm">
+
+  <!-- ===================== BASE (fixed pedestal) ===================== -->
+  <link name="base_link">
+    <visual>
+      <geometry><box size="0.2 0.2 0.1"/></geometry>
+      <origin xyz="0 0 0.05"/>
+      <material name="gray"><color rgba="0.4 0.4 0.45 1"/></material>
+    </visual>
+    <collision>
+      <geometry><box size="0.2 0.2 0.1"/></geometry>
+      <origin xyz="0 0 0.05"/>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <inertia ixx="0.02" iyy="0.02" izz="0.02" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+
+  <!-- ===================== SHOULDER JOINT (the one that swings) ======
+       type="revolute"  -> it rotates about one axis
+       axis xyz="0 1 0" -> it rotates about the Y axis (arm swings up/down)
+       limit            -> how far it can turn and how hard it can push
+       This joint is named "shoulder" — the script drives it back and forth. -->
+  <joint name="shoulder" type="revolute">
+    <parent link="base_link"/>
+    <child  link="upper_arm"/>
+    <origin xyz="0 0 0.1" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.57" upper="1.57" effort="50" velocity="5.0"/>
+  </joint>
+
+  <!-- ===================== UPPER ARM SEGMENT ===================== -->
+  <link name="upper_arm">
+    <visual>
+      <!-- a long thin box; shifted up so it grows out of the joint -->
+      <geometry><box size="0.05 0.05 0.4"/></geometry>
+      <origin xyz="0 0 0.2"/>
+      <material name="blue"><color rgba="0.2 0.5 0.9 1"/></material>
+    </visual>
+    <collision>
+      <geometry><box size="0.05 0.05 0.4"/></geometry>
+      <origin xyz="0 0 0.2"/>
+    </collision>
+    <inertial>
+      <mass value="1.0"/>
+      <origin xyz="0 0 0.2"/>
+      <inertia ixx="0.014" iyy="0.014" izz="0.001" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+
+  <!-- ===================== ELBOW JOINT (bends one way, like a real elbow) =====
+       A human elbow only flexes in ONE direction — it can't bend backward past
+       straight. So the lower limit is 0 (fully straight) and the upper limit is
+       about 2.5 rad (~143 deg), roughly the max a person can curl their forearm.
+       This is what stops the forearm from hyperextending the wrong way. -->
+  <joint name="elbow" type="revolute">
+    <parent link="upper_arm"/>
+    <child  link="forearm"/>
+    <origin xyz="0 0 0.4" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="0" upper="2.5" effort="50" velocity="5.0"/>
+  </joint>
+
+  <!-- ===================== FOREARM SEGMENT ===================== -->
+  <link name="forearm">
+    <visual>
+      <geometry><box size="0.05 0.05 0.35"/></geometry>
+      <origin xyz="0 0 0.175"/>
+      <material name="orange"><color rgba="0.95 0.55 0.2 1"/></material>
+    </visual>
+    <collision>
+      <geometry><box size="0.05 0.05 0.35"/></geometry>
+      <origin xyz="0 0 0.175"/>
+    </collision>
+    <inertial>
+      <mass value="0.7"/>
+      <origin xyz="0 0 0.175"/>
+      <inertia ixx="0.008" iyy="0.008" izz="0.001" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+
+</robot>

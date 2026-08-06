@@ -1,0 +1,16 @@
+# MediaPipe models (auto-downloaded on first run)
+*.task
+
+# extracted pose data + source videos (regenerable / large)
+*.npz
+*.mp4
+*.mov
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# macOS
+.DS_Store
