@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="armRosFile">
+  <link
+    name="arm_link">
+    <inertial>
+      <origin
+        xyz="0.000891303459169546 0.00730065005450808 0.0244577094987563"
+        rpy="0 0 0" />
+      <mass
+        value="0.627973378059561" />
+      <inertia
+        ixx="0.00155900409526339"
+        ixy="-2.11110987309042E-07"
+        ixz="2.40572969041577E-06"
+        iyy="0.00156061753437694"
+        iyz="-1.91309212770057E-06"
+        izz="0.00116041276097561" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://armRosFile/meshes/arm_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://armRosFile/meshes/arm_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="short_arm_link">
+    <inertial>
+      <origin
+        xyz="1.23460863754588E-09 -0.00566916339755819 -0.0235141201221242"
+        rpy="0 0 0" />
+      <mass
+        value="0.138255156587189" />
+      <inertia
+        ixx="0.000259996515223128"
+        ixy="-7.95456854559555E-08"
+        ixz="-2.43754362058068E-09"
+        iyy="9.63598208364411E-05"
+        iyz="-5.85531936751054E-06"
+        izz="0.000284931810112051" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://armRosFile/meshes/short_arm_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://armRosFile/meshes/short_arm_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="short_arm"
+    type="fixed">
+    <origin
+      xyz="0.000135398765666483 -0.0866366331969441 -0.0279824011015715"
+      rpy="0 0 0" />
+    <parent
+      link="arm_link" />
+    <child
+      link="short_arm_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="elbow_Link">
+    <inertial>
+      <origin
+        xyz="-0.000605555742169805 0.0394739809491743 -0.0108109614483796"
+        rpy="0 0 0" />
+      <mass
+        value="0.158178833168892" />
+      <inertia
+        ixx="0.000243570804084392"
+        ixy="-1.31464920678115E-07"
+        ixz="2.56905954631695E-06"
+        iyy="0.000332684193087832"
+        iyz="4.1878302215505E-06"
+        izz="0.000317444119465918" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://armRosFile/meshes/elbow_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://armRosFile/meshes/elbow_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="elbow"
+    type="fixed">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="arm_link" />
+    <child
+      link="elbow_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="bicep_Link">
+    <inertial>
+      <origin
+        xyz="-1.42283694379852E-05 0.0379551502038027 -0.00905701308974227"
+        rpy="0 0 0" />
+      <mass
+        value="0.245418330630813" />
+      <inertia
+        ixx="0.00101630914167305"
+        ixy="-1.08640924982468E-10"
+        ixz="-1.60895885208619E-07"
+        iyy="0.00110356103582406"
+        iyz="-1.18509244220687E-06"
+        izz="0.000517235924522898" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://armRosFile/meshes/bicep_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://armRosFile/meshes/bicep_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="bicep"
+    type="fixed">
+    <origin
+      xyz="2.83612166021019E-05 0.000342777510980219 0.125641150102891"
+      rpy="0 0 0" />
+    <parent
+      link="arm_link" />
+    <child
+      link="bicep_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="big_gear_Link">
+    <inertial>
+      <origin
+        xyz="-0.00899999999999879 2.16493489801906E-14 -1.83186799063151E-14"
+        rpy="0 0 0" />
+      <mass
+        value="0.0382194359196154" />
+      <inertia
+        ixx="1.45911616699868E-05"
+        ixy="-3.12726414636108E-21"
+        ixz="-1.41653679199342E-21"
+        iyy="8.32211862139204E-06"
+        iyz="-3.29916829013673E-10"
+        izz="8.33289258825403E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://armRosFile/meshes/big_gear_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 0.949019607843137 0.909803921568627 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://armRosFile/meshes/big_gear_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="big_gear"
+    type="revolute">
+    <origin
+      xyz="0.0231 0.038101 -0.052601"
+      rpy="0 0 0" />
+    <parent
+      link="arm_link" />
+    <child
+      link="big_gear_Link" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="0"
+      upper="0"
+      effort="0"
+      velocity="0" />
+  </joint>
+  <link
+    name="small_gear_Link">
+    <inertial>
+      <origin
+        xyz="-0.00899999999999945 7.40296712820054E-13 5.46229728115577E-14"
+        rpy="0 0 0" />
+      <mass
+        value="0.00629688353529975" />
+      <inertia
+        ixx="4.33270428790079E-07"
+        ixy="-4.59138287987704E-23"
+        ixz="7.73222650015706E-22"
+        iyy="3.86651069848133E-07"
+        iyz="-2.70538269723736E-22"
+        izz="3.86651069848133E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://armRosFile/meshes/small_gear_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 0.949019607843137 0.909803921568627 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://armRosFile/meshes/small_gear_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="small_gear"
+    type="revolute">
+    <origin
+      xyz="0.0231 0.0381 -0.01456"
+      rpy="0 0 0" />
+    <parent
+      link="arm_link" />
+    <child
+      link="small_gear_Link" />
+    <axis
+      xyz="-1 0 0" />
+    <limit
+      lower="0"
+      upper="0"
+      effort="0"
+      velocity="0" />
+  </joint>
+</robot>
