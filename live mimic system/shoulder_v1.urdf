@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<!-- ==========================================================================
+     shoulder_v1.urdf  —  the 2-servo shoulder module, standalone
+     ==========================================================================
+     Built from build_shoulder_cq.py (CadQuery, the single source of truth) and
+     shoulder_views.png. Source CAD is in MILLIMETRES; meshes were rescaled to
+     metres by sim/shoulder_prep.py, so no scale attribute is needed here.
+
+     MECHANISM (from the drive-path render)
+     --------------------------------------
+       servo A  -> turntable riding on 6 fixed balls   -> YAW   about Z
+       servo B  -> pivot gear bolted to the arm hub    -> PITCH about Y
+     Both drives are coaxial with their output in this CAD, so they are direct
+     drive - the gear teeth are cosmetic. Do not model tooth contact.
+
+     Axes intersect at (0, 0, 0.0985) - a genuine 2-DOF shoulder pivot.
+     Neutral pose is ARM STRAIGHT UP (pitch = 0).
+
+     MASS PROPERTIES
+     ---------------
+     The CAD carries no mass data. Every inertia below was integrated over the
+     actual mesh triangles by sim/shoulder_prep.py and transferred to the link
+     frame. Densities are [ASSUMPTION]: PLA 1240, steel 7850, servo 1750 kg/m^3.
+     Re-run shoulder_prep.py if the CAD changes.
+
+     COLLISION
+     ---------
+     Collision uses hand-placed primitives, NOT the meshes. MuJoCo convexifies
+     mesh collision geometry, and the arm is a C-bracket - its convex hull would
+     swallow the yoke it straddles and self-collide at every pose. The primitives
+     below are taken straight from the CadQuery parameters.
+     ========================================================================== -->
+<robot name="shoulder_v1">
+
+  <mujoco>
+    <compiler meshdir="meshes/shoulder/" balanceinertia="true" discardvisual="false"/>
+  </mujoco>
+
+  <material name="sh_orange"><color rgba="0.92 0.55 0.20 1"/></material>
+  <material name="sh_red"><color rgba="0.78 0.18 0.18 1"/></material>
+  <material name="sh_grey"><color rgba="0.69 0.70 0.73 1"/></material>
+  <material name="sh_teal"><color rgba="0.12 0.59 0.63 1"/></material>
+  <material name="sh_purple"><color rgba="0.35 0.24 0.43 1"/></material>
+  <material name="sh_dark"><color rgba="0.27 0.28 0.31 1"/></material>
+
+  <!-- ===================== BASE: housing + balls + servo A ================== -->
+  <link name="shoulder_base">
+    <inertial>
+      <origin xyz="0.003453 -0.000000 0.028121"/>
+      <mass value="0.157633"/>
+      <inertia ixx="0.000114156" ixy="0.000000000" ixz="0.000004747"
+               iyy="0.000123680" iyz="-0.000000000" izz="0.000165650"/>
+    </inertial>
+    <visual><geometry><mesh filename="housing.stl"/></geometry><material name="sh_orange"/></visual>
+    <visual><geometry><mesh filename="balls.stl"/></geometry><material name="sh_purple"/></visual>
+    <visual><geometry><mesh filename="servoA_body.stl"/></geometry><material name="sh_red"/></visual>
+    <!-- octagonal housing, boxed (conservative at the chamfers) -->
+    <collision>
+      <origin xyz="0 0 0.023"/>
+      <geometry><box size="0.084 0.084 0.046"/></geometry>
+    </collision>
+  </link>
+
+  <!-- ===================== YAW: servo A drives the turntable ================ -->
+  <joint name="shoulder_yaw" type="revolute">
+    <parent link="shoulder_base"/><child link="shoulder_yoke"/>
+    <origin xyz="0 0 0"/><axis xyz="0 0 1"/>
+    <!-- [PLACEHOLDER] MG996R-class servo, ~180 deg of travel -->
+    <limit lower="-1.5708" upper="1.5708" effort="9.0" velocity="6.0"/>
+    <dynamics damping="0.05" friction="0.02"/>
+  </joint>
+
+  <link name="shoulder_yoke">
+    <inertial>
+      <origin xyz="0.003678 0.002625 0.084187"/>
+      <mass value="0.147970"/>
+      <inertia ixx="0.000119922" ixy="0.000001102" ixz="-0.000007790"
+               iyy="0.000093819" iyz="-0.000005559" izz="0.000083651"/>
+    </inertial>
+    <visual><geometry><mesh filename="servoA_shaft.stl"/></geometry><material name="sh_teal"/></visual>
+    <visual><geometry><mesh filename="turntable.stl"/></geometry><material name="sh_grey"/></visual>
+    <visual><geometry><mesh filename="yoke.stl"/></geometry><material name="sh_orange"/></visual>
+    <visual><geometry><mesh filename="servoB_body.stl"/></geometry><material name="sh_red"/></visual>
+    <visual><geometry><mesh filename="idler_ball.stl"/></geometry><material name="sh_purple"/></visual>
+
+    <collision>  <!-- turntable gear -->
+      <origin xyz="0 0 0.0535"/>
+      <geometry><cylinder radius="0.034" length="0.006"/></geometry>
+    </collision>
+    <collision>  <!-- yoke base disc -->
+      <origin xyz="0 0 0.059"/>
+      <geometry><cylinder radius="0.028" length="0.005"/></geometry>
+    </collision>
+    <collision>  <!-- left upright -->
+      <origin xyz="0 0.026 0.0775"/>
+      <geometry><box size="0.046 0.008 0.042"/></geometry>
+    </collision>
+    <collision>  <!-- right upright -->
+      <origin xyz="0 -0.026 0.0775"/>
+      <geometry><box size="0.046 0.008 0.042"/></geometry>
+    </collision>
+    <collision>  <!-- left upright pivot boss -->
+      <origin xyz="0 0.026 0.0985" rpy="1.5707963 0 0"/>
+      <geometry><cylinder radius="0.023" length="0.008"/></geometry>
+    </collision>
+    <collision>  <!-- right upright pivot boss -->
+      <origin xyz="0 -0.026 0.0985" rpy="1.5707963 0 0"/>
+      <geometry><cylinder radius="0.023" length="0.008"/></geometry>
+    </collision>
+    <collision>  <!-- servo B body -->
+      <origin xyz="0.010 -0.001 0.0985"/>
+      <geometry><box size="0.054 0.042 0.020"/></geometry>
+    </collision>
+    <!-- idler ball has NO collision: it is the far-side pivot bearing and sits
+         inside a socket in the arm plate. Colliding it is like colliding a
+         bearing race with its own shaft - it registers 7.5mm of "penetration"
+         at every pose. -->
+  </link>
+
+  <!-- ==================== PITCH: servo B drives the arm ===================== -->
+  <!-- Child frame sits ON the pitch axis, so every mesh below is offset by
+       -0.0985 in Z to bring it back to where the CAD put it. -->
+  <joint name="shoulder_pitch" type="revolute">
+    <parent link="shoulder_yoke"/><child link="shoulder_arm"/>
+    <origin xyz="0 0 0.0985"/><axis xyz="0 1 0"/>
+    <!-- Limits are set from a measured collision sweep - see sweep_shoulder.py -->
+    <limit lower="0.0" upper="2.6180" effort="9.0" velocity="6.0"/>
+    <dynamics damping="0.05" friction="0.02"/>
+  </joint>
+
+  <link name="shoulder_arm">
+    <inertial>
+      <origin xyz="0.000000 -0.009465 0.021606"/>
+      <mass value="0.046075"/>
+      <inertia ixx="0.000064745" ixy="-0.000000000" ixz="0.000000000"
+               iyy="0.000030878" iyz="-0.000009423" izz="0.000041321"/>
+    </inertial>
+    <visual><origin xyz="0 0 -0.0985"/><geometry><mesh filename="arm.stl"/></geometry><material name="sh_dark"/></visual>
+    <visual><origin xyz="0 0 -0.0985"/><geometry><mesh filename="pivot_gear.stl"/></geometry><material name="sh_grey"/></visual>
+    <visual><origin xyz="0 0 -0.0985"/><geometry><mesh filename="servoB_shaft.stl"/></geometry><material name="sh_teal"/></visual>
+
+    <collision>  <!-- left arm plate -->
+      <origin xyz="0 0.035 0.024"/>
+      <geometry><box size="0.028 0.005 0.058"/></geometry>
+    </collision>
+    <collision>  <!-- right arm plate -->
+      <origin xyz="0 -0.035 0.024"/>
+      <geometry><box size="0.028 0.005 0.058"/></geometry>
+    </collision>
+    <collision>  <!-- left hub -->
+      <origin xyz="0 0.035 0" rpy="1.5707963 0 0"/>
+      <geometry><cylinder radius="0.016" length="0.005"/></geometry>
+    </collision>
+    <collision>  <!-- right hub -->
+      <origin xyz="0 -0.035 0" rpy="1.5707963 0 0"/>
+      <geometry><cylinder radius="0.016" length="0.005"/></geometry>
+    </collision>
+    <collision>  <!-- top mounting bar: this is the face the bicep bolts to -->
+      <origin xyz="0 0 0.050"/>
+      <geometry><box size="0.028 0.075 0.006"/></geometry>
+    </collision>
+    <!-- pivot gear has NO collision: it is the drive interface, same reasoning
+         as the elbow gears on the ATOM arm. NOTE FOR MECHANICAL: in the CAD the
+         gear spans y -34.5..-28.5mm and the yoke upright spans -30..-22mm, so
+         they overlap by 1.5mm axially. Harmless in sim, but it is a real
+         interference in the model - worth a counterbore or a 2mm shim. -->
+  </link>
+
+</robot>
