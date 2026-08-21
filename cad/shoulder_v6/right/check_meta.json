@@ -1,0 +1,204 @@
+{
+ "axes": {
+  "pitch": [
+   0,
+   -1,
+   0
+  ],
+  "roll": [
+   1,
+   0,
+   0
+  ],
+  "twist": [
+   0,
+   0,
+   1
+  ]
+ },
+ "origin": {
+  "pitch": [
+   0,
+   0,
+   100
+  ],
+  "roll": [
+   0,
+   0,
+   100
+  ],
+  "twist": [
+   0,
+   0,
+   100
+  ]
+ },
+ "chain": {
+  "base": [],
+  "carrier": [
+   "pitch"
+  ],
+  "yoke": [
+   "pitch",
+   "roll"
+  ],
+  "plate": [
+   "pitch",
+   "roll",
+   "twist"
+  ]
+ },
+ "groups": {
+  "base": [
+   "mount",
+   "pitch_retainer",
+   "servoP_body",
+   "brg_pitch"
+  ],
+  "carrier": [
+   "carrier",
+   "servoP_shaft",
+   "servoR_body",
+   "roll_idler"
+  ],
+  "yoke": [
+   "yoke",
+   "servoR_shaft",
+   "servoT_body",
+   "brg_twist",
+   "race_cap"
+  ],
+  "plate": [
+   "interface_plate",
+   "hub_clamp",
+   "servoT_shaft",
+   "bicep_ref"
+  ]
+ },
+ "bonded": [
+  [
+   "mount",
+   "brg_pitch"
+  ],
+  [
+   "mount",
+   "pitch_retainer"
+  ],
+  [
+   "mount",
+   "servoP_body"
+  ],
+  [
+   "brg_pitch",
+   "pitch_retainer"
+  ],
+  [
+   "carrier",
+   "brg_pitch"
+  ],
+  [
+   "carrier",
+   "servoP_shaft"
+  ],
+  [
+   "carrier",
+   "servoR_body"
+  ],
+  [
+   "carrier",
+   "roll_idler"
+  ],
+  [
+   "yoke",
+   "brg_twist"
+  ],
+  [
+   "yoke",
+   "race_cap"
+  ],
+  [
+   "yoke",
+   "roll_idler"
+  ],
+  [
+   "yoke",
+   "servoR_shaft"
+  ],
+  [
+   "yoke",
+   "servoT_body"
+  ],
+  [
+   "brg_twist",
+   "race_cap"
+  ],
+  [
+   "brg_twist",
+   "hub_clamp"
+  ],
+  [
+   "interface_plate",
+   "brg_twist"
+  ],
+  [
+   "interface_plate",
+   "hub_clamp"
+  ],
+  [
+   "interface_plate",
+   "bicep_ref"
+  ],
+  [
+   "hub_clamp",
+   "servoT_shaft"
+  ],
+  [
+   "servoP_body",
+   "servoP_shaft"
+  ],
+  [
+   "servoR_body",
+   "servoR_shaft"
+  ],
+  [
+   "servoT_body",
+   "servoT_shaft"
+  ]
+ ],
+ "exclude": {
+  "base|carrier": [],
+  "carrier|yoke": [],
+  "yoke|plate": []
+ },
+ "min_override": {},
+ "travel": {
+  "pitch": [
+   -60,
+   -30,
+   0,
+   45,
+   90,
+   135,
+   180
+  ],
+  "roll": [
+   -25,
+   -15,
+   -5,
+   0,
+   30,
+   60,
+   90,
+   120,
+   140,
+   150
+  ],
+  "twist": [
+   -90,
+   -45,
+   0,
+   45,
+   90
+  ]
+ }
+}

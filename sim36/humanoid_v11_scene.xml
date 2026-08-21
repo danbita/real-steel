@@ -1,0 +1,941 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mujoco model="humanoid_v11_scene">
+  <compiler angle="radian" meshdir="../live mimic system/meshes36d/" texturedir="../live mimic system/meshes36d/" />
+  <asset>
+    <mesh name="atom_head" content_type="model/obj" file="atom_head.obj" />
+    <mesh name="mount" content_type="model/stl" file="shoulder_v6/mount.stl" />
+    <mesh name="servoP_body" content_type="model/stl" file="shoulder_v6/servoP_body.stl" />
+    <mesh name="pitch_retainer" content_type="model/stl" file="shoulder_v6/pitch_retainer.stl" />
+    <mesh name="servoP_shaft" content_type="model/stl" file="shoulder_v6/servoP_shaft.stl" />
+    <mesh name="carrier" content_type="model/stl" file="shoulder_v6/carrier.stl" />
+    <mesh name="servoR_body" content_type="model/stl" file="shoulder_v6/servoR_body.stl" />
+    <mesh name="roll_idler" content_type="model/stl" file="shoulder_v6/roll_idler.stl" />
+    <mesh name="servoR_shaft" content_type="model/stl" file="shoulder_v6/servoR_shaft.stl" />
+    <mesh name="yoke" content_type="model/stl" file="shoulder_v6/yoke.stl" />
+    <mesh name="servoT_body" content_type="model/stl" file="shoulder_v6/servoT_body.stl" />
+    <mesh name="brg_twist" content_type="model/stl" file="shoulder_v6/brg_twist.stl" />
+    <mesh name="race_cap" content_type="model/stl" file="shoulder_v6/race_cap.stl" />
+    <mesh name="servoT_shaft" content_type="model/stl" file="shoulder_v6/servoT_shaft.stl" />
+    <mesh name="interface_plate" content_type="model/stl" file="shoulder_v6/interface_plate.stl" />
+    <mesh name="hub_clamp" content_type="model/stl" file="shoulder_v6/hub_clamp.stl" />
+    <mesh name="bicep_Link" content_type="model/stl" file="bicep_Link.STL" />
+    <mesh name="elbow_Link" content_type="model/stl" file="elbow_Link.STL" />
+    <mesh name="small_gear_Link" content_type="model/stl" file="small_gear_Link.STL" />
+    <mesh name="short_arm_link" content_type="model/stl" file="short_arm_link.STL" />
+    <mesh name="big_gear_Link" content_type="model/stl" file="big_gear_Link.STL" />
+    <mesh name="mount_r" content_type="model/stl" file="shoulder_v6/mount_r.stl" />
+    <mesh name="servoP_body_r" content_type="model/stl" file="shoulder_v6/servoP_body_r.stl" />
+    <mesh name="pitch_retainer_r" content_type="model/stl" file="shoulder_v6/pitch_retainer_r.stl" />
+    <mesh name="servoP_shaft_r" content_type="model/stl" file="shoulder_v6/servoP_shaft_r.stl" />
+    <mesh name="carrier_r" content_type="model/stl" file="shoulder_v6/carrier_r.stl" />
+    <mesh name="servoR_body_r" content_type="model/stl" file="shoulder_v6/servoR_body_r.stl" />
+    <mesh name="roll_idler_r" content_type="model/stl" file="shoulder_v6/roll_idler_r.stl" />
+    <mesh name="servoR_shaft_r" content_type="model/stl" file="shoulder_v6/servoR_shaft_r.stl" />
+    <mesh name="yoke_r" content_type="model/stl" file="shoulder_v6/yoke_r.stl" />
+    <mesh name="servoT_body_r" content_type="model/stl" file="shoulder_v6/servoT_body_r.stl" />
+    <mesh name="brg_twist_r" content_type="model/stl" file="shoulder_v6/brg_twist_r.stl" />
+    <mesh name="race_cap_r" content_type="model/stl" file="shoulder_v6/race_cap_r.stl" />
+    <mesh name="servoT_shaft_r" content_type="model/stl" file="shoulder_v6/servoT_shaft_r.stl" />
+    <mesh name="interface_plate_r" content_type="model/stl" file="shoulder_v6/interface_plate_r.stl" />
+    <mesh name="hub_clamp_r" content_type="model/stl" file="shoulder_v6/hub_clamp_r.stl" />
+    <texture type="2d" name="atomhead" file="atom_head.png" />
+    <material name="atomhead" texture="atomhead" specular="0.35" shininess="0.45" />
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072" />
+    <texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" />
+    <material name="groundplane" texture="groundplane" texuniform="true" texrepeat="4 4" reflectance="0.15" />
+  </asset>
+  <worldbody>
+    <geom size="0.025 0.0295 0.1317" pos="0 0 0.6163" type="box" contype="0" conaffinity="0" group="1" density="0" rgba="0.32 0.32 0.32 1" />
+    <geom size="0.025 0.0295 0.1317" pos="0 0 0.6163" type="box" rgba="0.32 0.32 0.32 1" name="col_torso_1" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom size="0.035 0.0875 0.0275" pos="0 0 0.4846" type="box" contype="0" conaffinity="0" group="1" density="0" rgba="0.32 0.32 0.32 1" />
+    <geom size="0.035 0.0875 0.0275" pos="0 0 0.4846" type="box" rgba="0.32 0.32 0.32 1" name="col_torso_3" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom size="0.012 0.024" pos="0 0 0.772" type="cylinder" contype="0" conaffinity="0" group="1" density="0" rgba="0.32 0.32 0.32 1" />
+    <geom pos="0.02 0 0.84208" quat="0.994522 0 -0.104529 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="atom_head" material="atomhead" />
+    <geom size="0.002 0.025 0.045" pos="0.027 0 0.66" type="box" contype="0" conaffinity="0" group="1" density="0" rgba="0.22 0.23 0.25 1" />
+    <geom pos="4.64102e-09 0.1184 0.848" quat="-2.32051e-08 0 1 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="mount" rgba="0.32 0.32 0.32 1" />
+    <geom pos="4.64102e-09 0.1184 0.848" quat="-2.32051e-08 0 1 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="servoP_body" rgba="0.16 0.16 0.17 1" />
+    <geom pos="4.64102e-09 0.1184 0.848" quat="-2.32051e-08 0 1 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="pitch_retainer" rgba="0.42 0.42 0.44 1" />
+    <geom size="0.031 0.0087 0.0385" pos="-2.32051e-11 0.0087 0.7475" quat="-2.32051e-08 0 1 0" type="box" name="col_torso_10" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom size="0.034 0.0087 0.0385" pos="-2.32051e-11 0.0261 0.7475" quat="-2.32051e-08 0 1 0" type="box" name="col_torso_11" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom size="0.034 0.0087 0.0385" pos="-2.32051e-11 0.0434 0.7475" quat="-2.32051e-08 0 1 0" type="box" name="col_torso_12" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom size="0.0116 0.0087 0.029" pos="-4.64102e-10 0.0608 0.738" quat="-2.32051e-08 0 1 0" type="box" name="col_torso_13" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom size="0.034 0.0087 0.036" pos="-1.39231e-10 0.0782 0.745" quat="-2.32051e-08 0 1 0" type="box" name="col_torso_14" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom size="0.01 0.02095 0.00905" pos="3.80564e-10 0.0524 0.7562" quat="-2.32051e-08 0 1 0" type="box" name="col_torso_15" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom size="0.00615 0.001 0.00905" pos="-4.64102e-10 0.0726 0.738" quat="-2.32051e-08 0 1 0" type="box" name="col_torso_16" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom size="0.01 0.0202 0.00905" pos="-1.30413e-09 0.0516 0.7199" quat="-2.32051e-08 0 1 0" type="box" name="col_torso_17" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom pos="4.64102e-09 -0.1184 0.848" quat="-2.32051e-08 0 1 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="mount_r" rgba="0.32 0.32 0.32 1" />
+    <geom pos="4.64102e-09 -0.1184 0.848" quat="-2.32051e-08 0 1 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="servoP_body_r" rgba="0.16 0.16 0.17 1" />
+    <geom pos="4.64102e-09 -0.1184 0.848" quat="-2.32051e-08 0 1 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="pitch_retainer_r" rgba="0.42 0.42 0.44 1" />
+    <geom size="0.031 0.0087 0.0385" pos="-2.32051e-11 -0.0087 0.7475" quat="-2.32051e-08 0 1 0" type="box" name="col_torso_21" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom size="0.034 0.0087 0.0385" pos="-2.32051e-11 -0.0261 0.7475" quat="-2.32051e-08 0 1 0" type="box" name="col_torso_22" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom size="0.034 0.0087 0.0385" pos="-2.32051e-11 -0.0434 0.7475" quat="-2.32051e-08 0 1 0" type="box" name="col_torso_23" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom size="0.0116 0.0087 0.029" pos="-4.64102e-10 -0.0608 0.738" quat="-2.32051e-08 0 1 0" type="box" name="col_torso_24" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom size="0.034 0.0087 0.036" pos="-1.39231e-10 -0.0782 0.745" quat="-2.32051e-08 0 1 0" type="box" name="col_torso_25" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom size="0.01 0.02095 0.00905" pos="3.80564e-10 -0.0524 0.7562" quat="-2.32051e-08 0 1 0" type="box" name="col_torso_26" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom size="0.00615 0.001 0.00905" pos="-4.64102e-10 -0.0726 0.738" quat="-2.32051e-08 0 1 0" type="box" name="col_torso_27" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <geom size="0.01 0.0202 0.00905" pos="-1.30413e-09 -0.0516 0.7199" quat="-2.32051e-08 0 1 0" type="box" name="col_torso_28" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" contype="0" conaffinity="0" />
+    <body name="L_shoulder_carrier" pos="0 0.1184 0.748" quat="-2.32051e-08 0 1 0">
+      <inertial pos="0.002497 -0.008889 -0.004951" quat="0.0854273 0.743045 0.174998 0.640283" mass="0.153571" diaginertia="0.00011387 0.000101576 6.01573e-05" />
+      <joint name="L_shoulder_pitch" pos="0 0 0" axis="0 -1 0" range="-1.0472 3.1416" actuatorfrcrange="-3 3" damping="0.06" frictionloss="0.02" solreflimit="0.002 1" margin="0" />
+      <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="servoP_shaft" rgba="0.55 0.52 0.45 1" />
+      <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="carrier" rgba="0.32 0.32 0.32 1" />
+      <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="servoR_body" rgba="0.16 0.16 0.17 1" />
+      <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="roll_idler" rgba="0.62 0.63 0.66 1" />
+      <geom size="0.009 0.0327 0.026" pos="-0.027 -0.0067 0" type="box" name="col_L_shoulder_carrier_4" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+      <geom size="0.009 0.0097 0.026" pos="-0.009 -0.0297 0" type="box" name="col_L_shoulder_carrier_5" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+      <geom size="0.009 0.0097 0.026" pos="0.009 -0.0297 0" type="box" name="col_L_shoulder_carrier_6" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+      <geom size="0.009 0.0327 0.03225" pos="0.027 -0.0067 -0.0063" type="box" name="col_L_shoulder_carrier_7" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+      <geom size="0.0202 0.01 0.00905" pos="0.0117 0 -0.0281" type="box" name="col_L_shoulder_carrier_8" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+      <geom size="0.001 0.00615 0.00905" pos="0.0327 0 -0.01" type="box" name="col_L_shoulder_carrier_9" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+      <geom size="0.02095 0.01 0.00905" pos="0.0125 0 0.0082" type="box" name="col_L_shoulder_carrier_10" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+      <body name="L_shoulder_yoke">
+        <inertial pos="0.000429 0.002949 0.06115" quat="0.704308 -0.0573666 -0.0811715 0.702902" mass="0.248273" diaginertia="0.000413904 0.000286233 0.000263021" />
+        <joint name="L_shoulder_roll" pos="0 0 0" axis="-1 0 0" range="-0.4363 2.618" actuatorfrcrange="-3 3" damping="0.06" frictionloss="0.02" solreflimit="0.002 1" margin="0" />
+        <geom pos="0 0 -0.1" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="servoR_shaft" rgba="0.55 0.52 0.45 1" />
+        <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="yoke" rgba="0.32 0.32 0.32 1" />
+        <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="servoT_body" rgba="0.16 0.16 0.17 1" />
+        <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="brg_twist" rgba="0.62 0.63 0.66 1" />
+        <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="race_cap" rgba="0.42 0.42 0.44 1" />
+        <geom size="0.046 0.02335 0.0096" pos="0 0 -0.0144" type="box" name="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <geom size="0.046 0.024 0.0096" pos="0 0 0.0049" type="box" name="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <geom size="0.046 0.012 0.0096" pos="0 0 0.0434" type="box" name="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <geom size="0.046 0.0285 0.0096" pos="0 0.01 0.0626" type="box" name="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <geom size="0.046 0.03525 0.0096" pos="0 0.0032 0.0819" type="box" name="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <geom size="0.01 0.00905 0.02095" pos="0 -0.0082 0.0504" type="box" name="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <geom size="0.00615 0.00905 0.001" pos="0 0.01 0.0706" type="box" name="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <geom size="0.01 0.00905 0.0202" pos="0 0.0281 0.0497" type="box" name="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <body name="L_shoulder_plate">
+          <inertial pos="6.47502e-05 -0.000610399 0.123251" quat="0.989638 0.00794745 0.00366049 0.14332" mass="0.088095" diaginertia="0.000148883 0.000142427 4.3769e-05" />
+          <joint name="L_shoulder_twist" pos="0 0 0" axis="0 0 1" range="-1.5708 1.5708" actuatorfrcrange="-3 3" damping="0.04" frictionloss="0.02" solreflimit="0.002 1" margin="0" />
+          <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="servoT_shaft" rgba="0.55 0.52 0.45 1" />
+          <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="interface_plate" rgba="0.24 0.24 0.26 1" />
+          <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="hub_clamp" rgba="0.42 0.42 0.44 1" />
+          <geom size="0.029 0.00825 0.00825" pos="0 -0.0247 0.0997" type="box" name="col_L_shoulder_plate_3" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+          <geom size="0.0172 0.00825 0.00875" pos="0 -0.0082 0.0933" type="box" name="col_L_shoulder_plate_4" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+          <geom size="0.0172 0.00825 0.00875" pos="0 0.0082 0.0933" type="box" name="col_L_shoulder_plate_5" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+          <geom size="0.029 0.00825 0.00825" pos="0 0.0247 0.0997" type="box" name="col_L_shoulder_plate_6" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+          <geom pos="-0.018392 -0.0093 0.102305" quat="1.27412e-08 -0.549071 -0.835776 1.93943e-08" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.2 0.55 0.68 1" mesh="bicep_Link" />
+          <geom pos="-0.018392 -0.0093 0.102305" quat="1.27412e-08 -0.549071 -0.835776 1.93943e-08" type="mesh" rgba="0.2 0.55 0.68 1" mesh="bicep_Link" name="col_L_shoulder_plate_8" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+          <geom pos="-0.0185531 -0.00938609 0.16902" quat="1.27412e-08 -0.549071 -0.835776 1.93943e-08" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.2 0.55 0.68 1" mesh="elbow_Link" />
+          <geom pos="-0.0185531 -0.00938609 0.16902" quat="1.27412e-08 -0.549071 -0.835776 1.93943e-08" type="mesh" rgba="0.2 0.55 0.68 1" mesh="elbow_Link" name="col_L_shoulder_plate_10" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+          <geom pos="-0.00485513 0.00990435 0.176752" quat="1.27412e-08 -0.549071 -0.835776 1.93943e-08" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="small_gear_Link" rgba="0.58 0.55 0.48 1" />
+          <body name="L_forearm" pos="1.55219e-05 -0.00135326 0.196952" quat="0.388252 -0.388252 -0.590983 0.590983">
+            <inertial pos="0.0016215 -0.00235342 -0.0097811" quat="0.686053 0.726626 0.0230488 -0.0285244" mass="0.026422" diaginertia="2.63355e-05 2.06412e-05 1.32984e-05" />
+            <joint name="L_elbow" pos="0 0 0" axis="-1 0 0" range="0 2.0944" actuatorfrcrange="-3 3" damping="0.15" frictionloss="0.05" solreflimit="0.002 1" margin="0" />
+            <geom pos="7.1897e-05 -0.0662357 0.0130725" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.2 0.55 0.68 1" mesh="short_arm_link" />
+            <geom pos="7.1897e-05 -0.0662357 0.0130725" quat="1 0 0 0" type="mesh" rgba="0.2 0.55 0.68 1" mesh="short_arm_link" name="col_L_forearm_1" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+            <geom pos="0.0122661 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="big_gear_Link" rgba="0.58 0.55 0.48 1" />
+          </body>
+        </body>
+      </body>
+    </body>
+    <body name="R_shoulder_carrier" pos="0 -0.1184 0.748" quat="-2.32051e-08 0 1 0">
+      <inertial pos="0.002497 0.008889 -0.004951" quat="-0.0854273 0.743045 -0.174998 0.640283" mass="0.153571" diaginertia="0.00011387 0.000101576 6.01573e-05" />
+      <joint name="R_shoulder_pitch" pos="0 0 0" axis="0 -1 0" range="-1.0472 3.1416" actuatorfrcrange="-3 3" damping="0.06" frictionloss="0.02" solreflimit="0.002 1" margin="0" />
+      <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="servoP_shaft_r" rgba="0.55 0.52 0.45 1" />
+      <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="carrier_r" rgba="0.32 0.32 0.32 1" />
+      <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="servoR_body_r" rgba="0.16 0.16 0.17 1" />
+      <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="roll_idler_r" rgba="0.62 0.63 0.66 1" />
+      <geom size="0.009 0.0327 0.026" pos="-0.027 0.0067 0" type="box" name="col_R_shoulder_carrier_4" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+      <geom size="0.009 0.0097 0.026" pos="-0.009 0.0297 0" type="box" name="col_R_shoulder_carrier_5" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+      <geom size="0.009 0.0097 0.026" pos="0.009 0.0297 0" type="box" name="col_R_shoulder_carrier_6" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+      <geom size="0.009 0.0327 0.03225" pos="0.027 0.0067 -0.0063" type="box" name="col_R_shoulder_carrier_7" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+      <geom size="0.0202 0.01 0.00905" pos="0.0117 0 -0.0281" type="box" name="col_R_shoulder_carrier_8" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+      <geom size="0.001 0.00615 0.00905" pos="0.0327 0 -0.01" type="box" name="col_R_shoulder_carrier_9" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+      <geom size="0.02095 0.01 0.00905" pos="0.0125 0 0.0082" type="box" name="col_R_shoulder_carrier_10" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+      <body name="R_shoulder_yoke">
+        <inertial pos="0.000429 -0.002949 0.06115" quat="0.702902 -0.0811715 -0.0573666 0.704308" mass="0.248273" diaginertia="0.000413904 0.000286233 0.000263021" />
+        <joint name="R_shoulder_roll" pos="0 0 0" axis="1 0 0" range="-0.4363 2.618" actuatorfrcrange="-3 3" damping="0.06" frictionloss="0.02" solreflimit="0.002 1" margin="0" />
+        <geom pos="0 0 -0.1" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="servoR_shaft_r" rgba="0.55 0.52 0.45 1" />
+        <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="yoke_r" rgba="0.32 0.32 0.32 1" />
+        <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="servoT_body_r" rgba="0.16 0.16 0.17 1" />
+        <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="brg_twist_r" rgba="0.62 0.63 0.66 1" />
+        <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="race_cap_r" rgba="0.42 0.42 0.44 1" />
+        <geom size="0.046 0.02335 0.0096" pos="0 0 -0.0144" type="box" name="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <geom size="0.046 0.024 0.0096" pos="0 0 0.0049" type="box" name="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <geom size="0.046 0.012 0.0096" pos="0 0 0.0434" type="box" name="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <geom size="0.046 0.0285 0.0096" pos="0 -0.01 0.0626" type="box" name="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <geom size="0.046 0.03525 0.0096" pos="0 -0.0032 0.0819" type="box" name="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <geom size="0.01 0.00905 0.02095" pos="0 0.0082 0.0504" type="box" name="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <geom size="0.00615 0.00905 0.001" pos="0 -0.01 0.0706" type="box" name="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <geom size="0.01 0.00905 0.0202" pos="0 -0.0281 0.0497" type="box" name="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <body name="R_shoulder_plate">
+          <inertial pos="1.18722e-05 -0.000564731 0.123251" quat="0.990296 0.00944218 0.0063447 -0.138506" mass="0.088095" diaginertia="0.00014892 0.000142405 4.37398e-05" />
+          <joint name="R_shoulder_twist" pos="0 0 0" axis="0 0 1" range="-1.5708 1.5708" actuatorfrcrange="-3 3" damping="0.04" frictionloss="0.02" solreflimit="0.002 1" margin="0" />
+          <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="servoT_shaft_r" rgba="0.55 0.52 0.45 1" />
+          <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="interface_plate_r" rgba="0.24 0.24 0.26 1" />
+          <geom pos="0 0 -0.1" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="hub_clamp_r" rgba="0.42 0.42 0.44 1" />
+          <geom size="0.029 0.00825 0.00825" pos="0 0.0247 0.0997" type="box" name="col_R_shoulder_plate_3" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+          <geom size="0.0172 0.00825 0.00875" pos="0 0.0082 0.0933" type="box" name="col_R_shoulder_plate_4" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+          <geom size="0.0172 0.00825 0.00875" pos="0 -0.0082 0.0933" type="box" name="col_R_shoulder_plate_5" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+          <geom size="0.029 0.00825 0.00825" pos="0 -0.0247 0.0997" type="box" name="col_R_shoulder_plate_6" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+          <geom pos="-0.018392 0.0068 0.102305" quat="-1.93943e-08 0.835776 0.549071 -1.27412e-08" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.72 0.42 0.18 1" mesh="bicep_Link" />
+          <geom pos="-0.018392 0.0068 0.102305" quat="-1.93943e-08 0.835776 0.549071 -1.27412e-08" type="mesh" rgba="0.72 0.42 0.18 1" mesh="bicep_Link" name="col_R_shoulder_plate_8" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+          <geom pos="-0.018565 0.00685844 0.16902" quat="-1.93943e-08 0.835776 0.549071 -1.27412e-08" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.72 0.42 0.18 1" mesh="elbow_Link" />
+          <geom pos="-0.018565 0.00685844 0.16902" quat="-1.93943e-08 0.835776 0.549071 -1.27412e-08" type="mesh" rgba="0.72 0.42 0.18 1" mesh="elbow_Link" name="col_R_shoulder_plate_10" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+          <geom pos="0.00487324 0.0100837 0.176752" quat="-1.93943e-08 0.835776 0.549071 -1.27412e-08" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="small_gear_Link" rgba="0.58 0.55 0.48 1" />
+          <body name="R_forearm" pos="3.56335e-06 -0.00117438 0.196952" quat="-0.590983 0.590983 0.388252 -0.388252">
+            <inertial pos="0.0016215 -0.00235342 -0.0097811" quat="0.686053 0.726626 0.0230488 -0.0285244" mass="0.026422" diaginertia="2.63355e-05 2.06412e-05 1.32984e-05" />
+            <joint name="R_elbow" pos="0 0 0" axis="-1 0 0" range="0 2.0944" actuatorfrcrange="-3 3" damping="0.15" frictionloss="0.05" solreflimit="0.002 1" margin="0" />
+            <geom pos="7.1897e-05 -0.0662357 0.0130725" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.72 0.42 0.18 1" mesh="short_arm_link" />
+            <geom pos="7.1897e-05 -0.0662357 0.0130725" quat="1 0 0 0" type="mesh" rgba="0.72 0.42 0.18 1" mesh="short_arm_link" name="col_R_forearm_1" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+            <geom pos="0.0122661 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="big_gear_Link" rgba="0.58 0.55 0.48 1" />
+          </body>
+        </body>
+      </body>
+    </body>
+    <body name="L_hip_link" pos="0 0.065 0.4846">
+      <inertial pos="0 0 0" mass="0.05" diaginertia="0.0001 0.0001 0.0001" />
+      <joint name="L_hip_flex" pos="0 0 0" axis="0 -1 0" range="-1 2.1" actuatorfrcrange="-3 3" solreflimit="0.002 1" margin="0" />
+      <body name="L_thigh">
+        <inertial pos="0 0 -0.112" mass="0.16" diaginertia="0.0007 0.0007 3e-05" />
+        <joint name="L_hip_abd" pos="0 0 0" axis="1 0 0" range="-0.4 1.2" actuatorfrcrange="-3 3" solreflimit="0.002 1" margin="0" />
+        <geom size="0.016 0.016 0.112" pos="0 0 -0.112" type="box" contype="0" conaffinity="0" group="1" density="0" rgba="0.2 0.55 0.68 1" />
+        <geom size="0.016 0.016 0.112" pos="0 0 -0.112" type="box" rgba="0.2 0.55 0.68 1" name="col_L_thigh_1" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <body name="L_shin" pos="0 0 -0.224">
+          <inertial pos="0 0 -0.112" mass="0.11" diaginertia="0.0005 0.0005 2e-05" />
+          <joint name="L_knee" pos="0 0 0" axis="0 1 0" range="0 2.4" actuatorfrcrange="-3 3" solreflimit="0.002 1" margin="0" />
+          <geom size="0.013 0.013 0.11245" pos="0 0 -0.11245" type="box" contype="0" conaffinity="0" group="1" density="0" rgba="0.2 0.55 0.68 1" />
+          <geom size="0.013 0.013 0.11245" pos="0 0 -0.11245" type="box" rgba="0.2 0.55 0.68 1" name="col_L_shin_1" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+          <geom size="0.0695 0.025 0.01785" pos="0.03 0 -0.24275" type="box" contype="0" conaffinity="0" group="1" density="0" rgba="0.2 0.55 0.68 1" />
+          <geom size="0.0695 0.025 0.01785" pos="0.03 0 -0.24275" type="box" rgba="0.2 0.55 0.68 1" name="col_L_shin_3" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        </body>
+      </body>
+    </body>
+    <body name="R_hip_link" pos="0 -0.065 0.4846">
+      <inertial pos="0 0 0" mass="0.05" diaginertia="0.0001 0.0001 0.0001" />
+      <joint name="R_hip_flex" pos="0 0 0" axis="0 -1 0" range="-1 2.1" actuatorfrcrange="-3 3" solreflimit="0.002 1" margin="0" />
+      <body name="R_thigh">
+        <inertial pos="0 0 -0.112" mass="0.16" diaginertia="0.0007 0.0007 3e-05" />
+        <joint name="R_hip_abd" pos="0 0 0" axis="-1 0 0" range="-0.4 1.2" actuatorfrcrange="-3 3" solreflimit="0.002 1" margin="0" />
+        <geom size="0.016 0.016 0.112" pos="0 0 -0.112" type="box" contype="0" conaffinity="0" group="1" density="0" rgba="0.72 0.42 0.18 1" />
+        <geom size="0.016 0.016 0.112" pos="0 0 -0.112" type="box" rgba="0.72 0.42 0.18 1" name="col_R_thigh_1" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        <body name="R_shin" pos="0 0 -0.224">
+          <inertial pos="0 0 -0.112" mass="0.11" diaginertia="0.0005 0.0005 2e-05" />
+          <joint name="R_knee" pos="0 0 0" axis="0 1 0" range="0 2.4" actuatorfrcrange="-3 3" solreflimit="0.002 1" margin="0" />
+          <geom size="0.013 0.013 0.11245" pos="0 0 -0.11245" type="box" contype="0" conaffinity="0" group="1" density="0" rgba="0.72 0.42 0.18 1" />
+          <geom size="0.013 0.013 0.11245" pos="0 0 -0.11245" type="box" rgba="0.72 0.42 0.18 1" name="col_R_shin_1" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+          <geom size="0.0695 0.025 0.01785" pos="0.03 0 -0.24275" type="box" contype="0" conaffinity="0" group="1" density="0" rgba="0.72 0.42 0.18 1" />
+          <geom size="0.0695 0.025 0.01785" pos="0.03 0 -0.24275" type="box" rgba="0.72 0.42 0.18 1" name="col_R_shin_3" condim="4" friction="0.8 0.05 0.001" solref="0.005 1" solimp="0.9 0.95 0.001" group="3" />
+        </body>
+      </body>
+    </body>
+    <light pos="0 0 3.0" dir="0 0 -1" directional="true" />
+    <light pos="1.5 -1.5 2.0" dir="-0.5 0.5 -1" diffuse="0.4 0.4 0.4" />
+    <geom name="floor" type="plane" pos="0 0 0" size="0 0 0.05" material="groundplane" condim="3" />
+    <camera name="demo" pos="1.05 -0.70 0.62" xyaxes="0.5547 0.8320 0 -0.1143 0.0762 0.9905" />
+    <camera name="front" pos="0.95 0 0.748" xyaxes="0 1 0 0 0 1" />
+    <camera name="shoulder" pos="0.30 0.36 0.85" xyaxes="-0.6279 0.7784 0 -0.2488 -0.2007 0.9476" />
+  </worldbody>
+  <option timestep="0.002" gravity="0 0 -9.81" integrator="implicitfast" cone="elliptic" />
+  <visual>
+    <headlight diffuse="0.62 0.62 0.62" ambient="0.38 0.38 0.38" specular="0.12 0.12 0.12" />
+    <rgba haze="0.15 0.25 0.35 1" />
+    <global azimuth="140" elevation="-20" offwidth="1280" offheight="720" />
+    <quality shadowsize="4096" />
+  </visual>
+  <actuator>
+    <position name="L_shoulder_pitch_act" joint="L_shoulder_pitch" kp="16.0" kv="0.5" forcerange="-10.6 10.6" ctrlrange="-3.7 3.7" />
+    <position name="L_shoulder_roll_act" joint="L_shoulder_roll" kp="16.0" kv="0.5" forcerange="-10.6 10.6" ctrlrange="-3.7 3.7" />
+    <position name="L_shoulder_twist_act" joint="L_shoulder_twist" kp="16.0" kv="0.5" forcerange="-10.6 10.6" ctrlrange="-3.7 3.7" />
+    <position name="L_elbow_act" joint="L_elbow" kp="6.0" kv="0.3" forcerange="-4.8 4.8" ctrlrange="-3.7 3.7" />
+    <position name="R_shoulder_pitch_act" joint="R_shoulder_pitch" kp="16.0" kv="0.5" forcerange="-10.6 10.6" ctrlrange="-3.7 3.7" />
+    <position name="R_shoulder_roll_act" joint="R_shoulder_roll" kp="16.0" kv="0.5" forcerange="-10.6 10.6" ctrlrange="-3.7 3.7" />
+    <position name="R_shoulder_twist_act" joint="R_shoulder_twist" kp="16.0" kv="0.5" forcerange="-10.6 10.6" ctrlrange="-3.7 3.7" />
+    <position name="R_elbow_act" joint="R_elbow" kp="6.0" kv="0.3" forcerange="-4.8 4.8" ctrlrange="-3.7 3.7" />
+    <position name="L_hip_flex_act" joint="L_hip_flex" kp="25.0" kv="1.2" forcerange="-4.8 4.8" ctrlrange="-3.7 3.7" />
+    <position name="L_hip_abd_act" joint="L_hip_abd" kp="25.0" kv="1.2" forcerange="-4.8 4.8" ctrlrange="-3.7 3.7" />
+    <position name="L_knee_act" joint="L_knee" kp="25.0" kv="1.2" forcerange="-4.8 4.8" ctrlrange="-3.7 3.7" />
+    <position name="R_hip_flex_act" joint="R_hip_flex" kp="25.0" kv="1.2" forcerange="-4.8 4.8" ctrlrange="-3.7 3.7" />
+    <position name="R_hip_abd_act" joint="R_hip_abd" kp="25.0" kv="1.2" forcerange="-4.8 4.8" ctrlrange="-3.7 3.7" />
+    <position name="R_knee_act" joint="R_knee" kp="25.0" kv="1.2" forcerange="-4.8 4.8" ctrlrange="-3.7 3.7" />
+  </actuator>
+  <contact>
+    <pair geom1="col_L_shoulder_plate_3" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_plate_4" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_plate_5" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_plate_6" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_plate_8" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_plate_10" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_4" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_5" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_6" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_7" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_8" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_9" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_10" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_4" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_5" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_6" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_7" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_8" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_9" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_10" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_4" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_5" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_6" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_7" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_8" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_9" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_10" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_4" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_5" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_6" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_7" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_8" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_9" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_10" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_4" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_5" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_6" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_7" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_8" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_9" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_10" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_4" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_5" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_6" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_7" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_8" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_9" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_10" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_yoke_5" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_yoke_6" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_yoke_7" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_yoke_8" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_yoke_9" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_yoke_10" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_yoke_11" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_yoke_12" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_L_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_L_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_L_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_L_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_L_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_L_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_L_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_L_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_L_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_4" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_5" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_6" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_7" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_8" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_9" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_10" geom2="col_L_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_4" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_5" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_6" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_7" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_8" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_9" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_10" geom2="col_L_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_4" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_5" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_6" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_7" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_8" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_9" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_10" geom2="col_L_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_4" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_5" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_6" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_7" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_8" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_9" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_10" geom2="col_L_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_4" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_5" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_6" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_7" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_8" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_9" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_L_shoulder_carrier_10" geom2="col_L_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_plate_3" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_plate_4" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_plate_5" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_plate_6" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_plate_8" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_plate_10" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_4" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_5" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_6" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_7" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_8" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_9" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_10" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_4" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_5" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_6" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_7" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_8" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_9" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_10" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_4" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_5" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_6" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_7" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_8" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_9" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_10" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_4" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_5" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_6" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_7" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_8" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_9" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_10" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_4" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_5" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_6" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_7" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_8" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_9" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_10" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_4" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_5" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_6" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_7" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_8" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_9" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_10" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_yoke_5" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_yoke_6" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_yoke_7" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_yoke_8" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_yoke_9" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_yoke_10" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_yoke_11" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_yoke_12" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_R_forearm_1" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_R_shoulder_yoke_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_R_shoulder_yoke_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_R_shoulder_yoke_7" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_R_shoulder_yoke_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_R_shoulder_yoke_9" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_R_shoulder_yoke_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_R_shoulder_yoke_11" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_1" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_3" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_10" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_11" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_12" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_13" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_14" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_15" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_16" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_17" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_21" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_22" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_23" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_24" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_25" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_26" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_27" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_torso_28" geom2="col_R_shoulder_yoke_12" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_4" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_5" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_6" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_7" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_8" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_9" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_10" geom2="col_R_shoulder_plate_4" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_4" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_5" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_6" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_7" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_8" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_9" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_10" geom2="col_R_shoulder_plate_5" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_4" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_5" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_6" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_7" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_8" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_9" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_10" geom2="col_R_shoulder_plate_6" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_4" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_5" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_6" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_7" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_8" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_9" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_10" geom2="col_R_shoulder_plate_8" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_4" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_5" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_6" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_7" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_8" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_9" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+    <pair geom1="col_R_shoulder_carrier_10" geom2="col_R_shoulder_plate_10" condim="4" friction="0.8 0.8 0.05 0.001 0.001" />
+  </contact>
+</mujoco>

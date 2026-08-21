@@ -8,6 +8,23 @@ time. Or feed it a video and it replays the motion. Built with
 The pipeline: **video / webcam → 33 body landmarks per frame → 8 joint angles
 (retargeting) → animated humanoid**.
 
+## Atom — the physical robot
+
+The simulated humanoid is becoming a ~36-inch buildable boxing robot. The
+shoulder is done: a 3-DOF module (pitch × roll × twist) around three Hiwonder
+HTS-35H bus servos, physics-verified down to every screw corridor.
+
+![Atom v11 mimic](media/atom_v11_preview.gif)
+
+- **Robot-only clean run:** [media/atom_v11_robot_clean.mp4](media/atom_v11_robot_clean.mp4)
+- **Side-by-side vs. the reference clip:** [media/mimic_sidebyside_v11.mp4](media/mimic_sidebyside_v11.mp4) (3.56° mean tracking error over 1801 frames)
+- **📖 [Shoulder assembly manual](docs/assembly/index.html)** — pictures-first,
+  animated steps, print + order lists with sizes. Self-contained HTML: works
+  offline, ready for GitHub Pages (`main` / `docs` folder).
+- CAD source: [cad/shoulder_v6/](cad/shoulder_v6/) (CadQuery, left + right);
+  sim chain: [sim36/](sim36/); renderers: [tools/render/](tools/render/)
+
+
 ## How it works
 
 MediaPipe's PoseLandmarker detects 33 body landmarks (head, shoulders, elbows,
