@@ -67,7 +67,11 @@ OE_D_CUTOFF = 1.0
 
 # flip any joint family if it mirrors on your setup
 SIGN = {"shoulder_flex": 1.0, "shoulder_abd": 1.0, "shoulder_twist": 1.0,
-        "elbow": 1.0, "hip_flex": 1.0, "hip_abd": 1.0, "knee": 1.0}
+        "elbow": 1.0, "hip_flex": 1.0, "hip_abd": 1.0, "knee": 1.0,
+        # Set these from sim36/neck_chain_check.py section 6, which prints which
+        # way the modelled head actually moves for +20 deg on each joint - not
+        # by guessing.
+        "neck_yaw": 1.0, "neck_pitch": 1.0, "neck_roll": 1.0}
 
 LIMITS = {
     "shoulder_flex": (-1.2, 3.1), "shoulder_abd": (-0.5, 3.0),
@@ -75,7 +79,26 @@ LIMITS = {
     "elbow": (0.0, 2.7),
     "hip_flex": (-1.0, 2.1), "hip_abd": (-0.4, 1.2),
     "knee": (0.0, 2.4),
+    # Mirror neck_v1.urdf exactly (gen_neck.py: 90% of the servo's travel), so
+    # the sender never commands a pose the model will refuse. Regenerate both if
+    # SERVO_TRAVEL_DEG there changes.
+    "neck_yaw": (-1.413717, 1.413717),
+    "neck_pitch": (-1.413717, 1.413717),
+    "neck_roll": (-1.413717, 1.413717),
 }
+
+# The neck model is 2 DOF - yaw and pitch. See gen_neck.py: the CAD's own part
+# names are YesHolder (nod) and NoHolder (turn), and once the export's
+# double-counted parts are removed only two moving groups remain. Roll is
+# measured anyway, because it is free once the head frame exists and it is the
+# evidence that would justify a third axis, but it is NOT sent by default -
+# a receiver driving neck_v1.urdf has no joint to put it in.
+SEND_NECK_ROLL = False
+
+# Below this, the ear-to-ear baseline is too short to trust for roll: |sin| of
+# the head's tilt out of the body's frontal plane. Ear world-depth is the weakest
+# signal MediaPipe gives, so roll degrades first.
+NECK_GIMBAL_MIN = 0.25
 
 NOSE = 0
 L_SHOULDER, R_SHOULDER = 11, 12
@@ -86,6 +109,14 @@ L_KNEE, R_KNEE = 25, 26
 L_ANKLE, R_ANKLE = 27, 28
 L_HEEL, R_HEEL = 29, 30
 L_FOOT, R_FOOT = 31, 32
+
+# Face landmarks, for the neck. MediaPipe Pose numbering: 0 nose, 2/5 the eye
+# centres, 7/8 the ear tragions. The EARS are the primary baseline - they sit on
+# the skull's own left-right axis and barely move with expression, where the eyes
+# are 60 mm apart and their world-depth is the noisiest part of the whole
+# landmark set. Eyes are only a fallback when an ear is occluded.
+L_EYE, R_EYE = 2, 5
+L_EAR, R_EAR = 7, 8
 
 ARM_CHAIN_L, ARM_CHAIN_R = [13, 15, 17, 19, 21], [14, 16, 18, 20, 22]
 LEG_CHAIN_L, LEG_CHAIN_R = [25, 27, 29, 31], [26, 28, 30, 32]
@@ -100,7 +131,8 @@ POSE_CONNECTIONS = [
 JOINT_NAMES = ["L_shoulder_flex", "L_shoulder_abd", "L_shoulder_twist", "L_elbow",
                "R_shoulder_flex", "R_shoulder_abd", "R_shoulder_twist", "R_elbow",
                "L_hip_flex", "L_hip_abd", "L_knee",
-               "R_hip_flex", "R_hip_abd", "R_knee"]
+               "R_hip_flex", "R_hip_abd", "R_knee",
+               "neck_yaw", "neck_pitch", "neck_roll"]
 
 
 def ensure_model():
@@ -417,6 +449,159 @@ def body_frame(world, hips_ok=True):
     return fwd, left, up
 
 
+class NeckNeutral:
+    """Learns the head's RESTING orientation relative to the torso, then reports
+    every later frame relative to that.
+
+    THIS IS NOT A REFINEMENT, IT IS REQUIRED FOR CORRECTNESS.
+        head_frame() builds forward from (nose - ear_midpoint) with the ear-line
+        component removed. On a real head the nose sits BELOW the ear line - on
+        the order of 15-20 deg below - so the recovered frame is pitched down by
+        that angle even when the person is looking dead ahead. Sent raw, Atom
+        stares at the floor at rest and every nod carries a constant offset. The
+        offset is a property of face geometry, so it differs per person and
+        cannot be hard-coded.
+
+        Taking the neutral out also cancels resting head posture (most people
+        carry the head slightly forward and a few degrees off-axis), which is
+        what you want when the job is to MIRROR movement rather than to measure
+        absolute anatomy.
+
+    Rotations are averaged as matrices and projected back onto SO(3) with an SVD.
+    Averaging the three Euler angles instead would be wrong - they do not
+    commute, and the mean of a set of angle triples is not the triple of the mean
+    rotation.
+    """
+
+    verbose = True
+    N = 45      # ~1.5 s at 30 fps. Long enough to average out landmark jitter,
+                # short enough that nobody holds a pose waiting for it.
+
+    def __init__(self):
+        self.acc = []
+        self.R0 = None
+
+    @property
+    def ready(self):
+        return self.R0 is not None
+
+    def progress(self):
+        return min(1.0, len(self.acc) / float(self.N))
+
+    def observe(self, R):
+        if self.ready:
+            return
+        self.acc.append(np.asarray(R, dtype=float))
+        if len(self.acc) >= self.N:
+            M = sum(self.acc) / float(len(self.acc))
+            U, _, Vt = np.linalg.svd(M)      # nearest rotation to the mean
+            self.R0 = U @ Vt
+            if float(np.linalg.det(self.R0)) < 0:
+                U[:, -1] *= -1.0             # guard against a reflection
+                self.R0 = U @ Vt
+            if self.verbose:
+                print("Neck neutral captured (head-vs-torso rest pose).")
+
+    def rel(self, R):
+        return np.asarray(R, dtype=float) if self.R0 is None else self.R0.T @ R
+
+
+NECK_NEUTRAL = NeckNeutral()
+
+
+def head_frame(world, vis):
+    """The skull's own orthonormal triad, or None if the face is not observable.
+
+    Returns (h_fwd, h_left, h_up, used_eyes). Same handedness convention as
+    body_frame: fwd = left x up, so the two frames can be compared directly.
+
+    WHY THE EARS AND NOT THE EYES
+        The ear tragions are ~150 mm apart and sit on the skull's true
+        left-right axis, so they give the longest, most rigid baseline the pose
+        model offers above the shoulders. The eyes are ~60 mm apart; halving the
+        baseline doubles the angular error for the same landmark noise, and
+        MediaPipe's world-landmark DEPTH on face points is its weakest output.
+        Eyes are therefore a degraded fallback for when a head turn occludes an
+        ear, which happens well before 90 deg of yaw - and the caller is told
+        via used_eyes so it can hold roll rather than trust it.
+    """
+    if vis[NOSE] < VIS_OFF:
+        return None
+    ears_ok = min(vis[L_EAR], vis[R_EAR]) >= VIS_OFF
+    eyes_ok = min(vis[L_EYE], vis[R_EYE]) >= VIS_OFF
+    if ears_ok:
+        span, mid = world[L_EAR] - world[R_EAR], 0.5 * (world[L_EAR] + world[R_EAR])
+        used_eyes = False
+    elif eyes_ok:
+        span, mid = world[L_EYE] - world[R_EYE], 0.5 * (world[L_EYE] + world[R_EYE])
+        used_eyes = True
+    else:
+        return None
+
+    if np.linalg.norm(span) < 1e-6:
+        return None
+    h_left = unit(span)
+    nose_out = world[NOSE] - mid              # out of the face, roughly
+    h_up = np.cross(nose_out, h_left)         # up = fwd x left
+    if np.linalg.norm(h_up) < 1e-6:
+        return None                           # nose collinear with the ear line
+    h_up = unit(h_up)
+    h_fwd = unit(np.cross(h_left, h_up))      # fwd = left x up
+    h_left = np.cross(h_up, h_fwd)            # re-orthogonalize, exactly
+    return h_fwd, h_left, h_up, used_eyes
+
+
+def neck_angles(world, vis, gates, fwd, left, up, neutral=None):
+    """Head orientation RELATIVE TO THE TORSO -> neck yaw / pitch / roll.
+
+    The whole point of measuring in the body frame, exactly as the limbs already
+    do: the answer is what the neck is doing, not where the camera is. Lean the
+    torso, tilt the camera, walk around the person - these angles do not move.
+    A head-vs-camera measurement would fold all of that in.
+
+    Decomposition is intrinsic yaw -> pitch -> roll (Rz Ry Rx in the body's
+    fwd/left/up basis), matching the order the joints stack in neck_v1.urdf.
+    Composition order matters: applying the same three numbers in a different
+    order gives a different head pose.
+    """
+    if not gates.check("neck", min(vis[NOSE],
+                                   max(min(vis[L_EAR], vis[R_EAR]),
+                                       min(vis[L_EYE], vis[R_EYE])))):
+        return {}
+    hf = head_frame(world, vis)
+    if hf is None:
+        return {}
+    h_fwd, h_left, h_up, used_eyes = hf
+
+    # R[i][j] = (body axis i) . (head axis j)
+    B = (fwd, left, up)
+    R = np.array([[float(np.dot(B[i], H)) for H in (h_fwd, h_left, h_up)]
+                  for i in range(3)])
+
+    neutral = NECK_NEUTRAL if neutral is None else neutral
+    neutral.observe(R)
+    if not neutral.ready:
+        return {}                 # biased until the rest pose is known - see NeckNeutral
+    R = neutral.rel(R)
+
+    out = {}
+    # pitch first: it is the one with a singularity, and it gates the others.
+    sp = max(-1.0, min(1.0, -R[2][0]))
+    pitch = math.asin(sp)                     # + = nose down, matching *_flex
+    cp = math.hypot(R[0][0], R[1][0])         # cos(pitch)
+    out["neck_pitch"] = clamp("neck_pitch", SIGN["neck_pitch"] * pitch)
+
+    if cp > NECK_GIMBAL_MIN:
+        # yaw: + = face turns toward the person's OWN left
+        out["neck_yaw"] = clamp("neck_yaw", SIGN["neck_yaw"] * math.atan2(R[1][0], R[0][0]))
+        if SEND_NECK_ROLL and not used_eyes:
+            out["neck_roll"] = clamp("neck_roll",
+                                     SIGN["neck_roll"] * math.atan2(R[2][1], R[2][2]))
+    # else: near-vertical nose, yaw and roll trade off against each other and
+    # noise picks the split. Holding the previous value beats sending a guess.
+    return out
+
+
 def frame_angles(world, vis, gates):
     # Shoulders are mandatory - without them there is no torso to reference.
     if min(vis[L_SHOULDER], vis[R_SHOULDER]) < VIS_OFF:
@@ -476,6 +661,8 @@ def frame_angles(world, vis, gates):
             if gates.check(f"{side}_shin", ankle_ev, on=0.5, off=0.35):
                 out[f"{side}_knee"] = clamp(
                     "knee", bend(world[kn] - world[hip], world[an] - world[kn]))
+
+    out.update(neck_angles(world, vis, gates, fwd, left, up))
     return out
 
 

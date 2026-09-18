@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mujoco model="atom_neck_v1">
+  <compiler angle="radian" />
+  <asset>
+    <mesh name="neckcover_link" content_type="model/stl" file="../NeckAssembly_files/meshes/neckcover_link.STL" />
+    <mesh name="servo2_Link" content_type="model/stl" file="../NeckAssembly_files/meshes/servo2_Link.STL" />
+    <mesh name="MotorHolder2_Link" content_type="model/stl" file="../NeckAssembly_files/meshes/MotorHolder2_Link.STL" />
+    <mesh name="BigHolder_Link" content_type="model/stl" file="../NeckAssembly_files/meshes/BigHolder_Link.STL" />
+    <mesh name="servo1_Link" content_type="model/stl" file="../NeckAssembly_files/meshes/servo1_Link.STL" />
+    <mesh name="YesHolder2_Link" content_type="model/stl" file="../NeckAssembly_files/meshes/YesHolder2_Link.STL" />
+  </asset>
+  <worldbody>
+    <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="neckcover_link" />
+    <geom type="mesh" mesh="neckcover_link" contype="0" conaffinity="0" />
+    <geom pos="-0.00937902 -0.0293076 -0.143545" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="servo2_Link" />
+    <geom pos="-0.00937902 -0.0293076 -0.143545" quat="1 0 0 0" type="mesh" mesh="servo2_Link" contype="0" conaffinity="0" />
+    <geom pos="-0.0239949 -0.0293076 -0.107995" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="MotorHolder2_Link" />
+    <geom pos="-0.0239949 -0.0293076 -0.107995" quat="1 0 0 0" type="mesh" mesh="MotorHolder2_Link" contype="0" conaffinity="0" />
+    <body name="neck_yaw_link" pos="-0.00287892 0.065653 -0.0776951">
+      <inertial pos="-0.00183156 -0.0280915 -0.000149921" quat="0.505771 0.481024 0.493144 0.51925" mass="0.258768" diaginertia="0.000304446 0.000207645 0.000194351" />
+      <joint name="neck_yaw" pos="0 0 0" axis="-0.0397698 0.999209 0" range="-1.41372 1.41372" actuatorfrcrange="-4 4" />
+      <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="BigHolder_Link" />
+      <geom type="mesh" mesh="BigHolder_Link" contype="0" conaffinity="0" />
+      <geom pos="-0.00919945 -0.00792213 -9.98706e-05" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="servo1_Link" />
+      <geom pos="-0.00919945 -0.00792213 -9.98706e-05" quat="1 0 0 0" type="mesh" mesh="servo1_Link" contype="0" conaffinity="0" />
+      <body name="neck_pitch_link" pos="-0.00628681 -0.0809199 0.02">
+        <inertial pos="0.0112335 0.0471248 -0.0110543" quat="0.0767268 0.545876 -0.651746 0.520921" mass="0.559242" diaginertia="0.00150574 0.00146805 0.00115148" />
+        <joint name="neck_pitch" pos="0 0 0" axis="0 0 1" range="-1.41372 1.41372" actuatorfrcrange="-4 4" />
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" mesh="YesHolder2_Link" />
+        <geom type="mesh" mesh="YesHolder2_Link" contype="0" conaffinity="0" />
+        <geom size="0.0503 0.07185 0.0503" pos="0 0.07185 0" type="box" contype="0" conaffinity="0" group="1" density="0" rgba="0.55 0.45 0.35 1" />
+        <site name="head" pos="0 0.071850 0" size="0.008" rgba="1 0.5 0 1" />
+      </body>
+    </body>
+  </worldbody>
+  <actuator>
+    <position name="neck_yaw_act" joint="neck_yaw" kp="8.0" kv="0.4" forcerange="-4.0 4.0" ctrlrange="-1.5 1.5" />
+    <position name="neck_pitch_act" joint="neck_pitch" kp="8.0" kv="0.4" forcerange="-4.0 4.0" ctrlrange="-1.5 1.5" />
+  </actuator>
+</mujoco>

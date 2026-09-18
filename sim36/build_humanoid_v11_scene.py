@@ -31,13 +31,17 @@ DRIVEN = [
     ("R_shoulder_twist", 10.6), ("R_elbow", 4.8),
     ("L_hip_flex", 4.8), ("L_hip_abd", 4.8), ("L_knee", 4.8),
     ("R_hip_flex", 4.8), ("R_hip_abd", 4.8), ("R_knee", 4.8),
+    # Neck. Without actuators these joints exist but are unactuated, so the head
+    # simply falls over under gravity the moment the sim starts.
+    ("neck_yaw", 4.0), ("neck_pitch", 4.0),
 ]
 
 # Real servos on the shoulder and elbow; the legs are still the rig's own
 # fictional joints and just need to track.
 # STS3215 class: 3 Nm stall. A 63 g arm needs almost nothing, so gains are
 # far lower than the person-scale model.
-GAINS = {"elbow": (6.0, 0.3), "shoulder": (16.0, 0.5), "default": (25.0, 1.2)}
+GAINS = {"elbow": (6.0, 0.3), "shoulder": (16.0, 0.5), "neck": (8.0, 0.4),
+         "default": (25.0, 1.2)}
 
 MESH_RGBA = {
     # Atom palette (see gen_humanoid_v11.py). The module used to be an orange /
@@ -115,6 +119,26 @@ def main():
             geom.set("group", "3")          # hide collision prims from the render
             cg.setdefault(bname, []).append(gname)
 
+    # NECK: collision off, for the same reason build_neck_scene.py turns it off.
+    # The neck is a NESTED assembly - holders inside the cover, servos inside the
+    # holders - so its parts start out interpenetrating and the solver spends
+    # every step shoving them apart. Measured on the standalone model: 16
+    # contacts at the zero pose, and neck_yaw stalled at 1.53 deg no matter what
+    # it was commanded. Travel here is bounded by the joint limits (90% of servo
+    # travel), not by parts touching, so contact buys nothing.
+    # The neck BASE needs no handling: it welds into the world body and its mesh
+    # geoms fall through the col_torso size filter below, which already disables
+    # anything that is not the torso box.
+    nneck = 0
+    for body in root.iter("body"):
+        if not (body.get("name") or "").startswith("neck"):
+            continue
+        for geom in body.findall("geom"):
+            geom.set("contype", "0")
+            geom.set("conaffinity", "0")
+            nneck += 1
+    print(f"  neck: collision disabled on {nneck} geoms (nested assembly)")
+
     # MuJoCo joint limits are soft by default; with these servo gains the yaw
     # joint overshot its stop by ~4 deg, which is exactly the margin that keeps
     # the bicep out of the chest. Stiffen every limit constraint.
@@ -173,6 +197,8 @@ def main():
     for jname, frc in DRIVEN:
         if jname.endswith("elbow"):
             kp, kv = GAINS["elbow"]
+        elif jname.startswith("neck"):
+            kp, kv = GAINS["neck"]
         elif "shoulder" in jname:
             kp, kv = GAINS["shoulder"]
         else:

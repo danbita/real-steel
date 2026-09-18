@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="NeckAssembly_files">
+  <link
+    name="neckcover_link">
+    <inertial>
+      <origin
+        xyz="-0.000558029400309135 -0.0132805133453129 -0.0808536864183735"
+        rpy="0 0 0" />
+      <mass
+        value="0.387247978246228" />
+      <inertia
+        ixx="0.0013908119540614"
+        ixy="-2.63354598095922E-06"
+        ixz="-7.74120926286103E-06"
+        iyy="0.0021404377841576"
+        iyz="-1.49807770509356E-05"
+        izz="0.00134886877383479" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/neckcover_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/neckcover_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="servo1_Link">
+    <inertial>
+      <origin
+        xyz="0.00107785746202449 -0.0202337522164758 -0.000369936540011384"
+        rpy="0 0 0" />
+      <mass
+        value="0.0887120121025638" />
+      <inertia
+        ixx="1.49387862720465E-05"
+        ixy="4.83052983164599E-08"
+        ixz="-4.82472974672763E-07"
+        iyy="1.52980238589682E-05"
+        iyz="-1.73614642877977E-08"
+        izz="2.43935449578733E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/servo1_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/servo1_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="servo1_joint"
+    type="continuous">
+    <origin
+      xyz="-0.0120783707860205 0.0577309103883369 -0.0777949432374814"
+      rpy="0 0 0" />
+    <parent
+      link="neckcover_link" />
+    <child
+      link="servo1_Link" />
+    <axis
+      xyz="0.0397697640940149 -0.999208869988606 0" />
+  </joint>
+  <link
+    name="servo2_Link">
+    <inertial>
+      <origin
+        xyz="0.000383308582433739 0.000253145019879719 0.0202606152149591"
+        rpy="0 0 0" />
+      <mass
+        value="0.0887119391383713" />
+      <inertia
+        ixx="2.44181232819431E-05"
+        ixy="-1.88991552823228E-11"
+        ixz="-1.34172276944908E-09"
+        iyy="1.49185851114147E-05"
+        iyz="-6.24362817847641E-08"
+        izz="1.52935940924499E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/servo2_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/servo2_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="servo2_joint"
+    type="fixed">
+    <origin
+      xyz="-0.00937901763228322 -0.0293076079355733 -0.143545072663795"
+      rpy="0 0 0" />
+    <parent
+      link="neckcover_link" />
+    <child
+      link="servo2_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="servo3_Link">
+    <inertial>
+      <origin
+        xyz="-0.0202546506906401 -0.000552825241477706 0.000383314702415927"
+        rpy="0 0 0" />
+      <mass
+        value="0.0887120062426798" />
+      <inertia
+        ixx="1.52880587637806E-05"
+        ixy="7.7145336412361E-08"
+        ixz="1.33887279409565E-09"
+        iyy="1.49241489394055E-05"
+        iyz="4.28543792093103E-11"
+        izz="2.4418141786291E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/servo3_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.843137254901961 0 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/servo3_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="servo3_joint"
+    type="continuous">
+    <origin
+      xyz="0.0644349742299666 -0.026392724662669 -0.0780791409299753"
+      rpy="0 0 0" />
+    <parent
+      link="neckcover_link" />
+    <child
+      link="servo3_Link" />
+    <axis
+      xyz="-0.999208869988605 -0.0397697640940424 0" />
+  </joint>
+  <link
+    name="BigHolder_Link">
+    <inertial>
+      <origin
+        xyz="0.00144973073565779 -0.0280578595382105 1.6952181454144E-05"
+        rpy="0 0 0" />
+      <mass
+        value="0.170055648143212" />
+      <inertia
+        ixx="0.000179504204825404"
+        ixy="-2.8122283212968E-06"
+        ixz="7.73945281530524E-08"
+        iyy="0.000283721275988835"
+        iyz="7.13098915279854E-08"
+        izz="0.000177876239157666" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/BigHolder_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/BigHolder_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="BigHolder_joint"
+    type="continuous">
+    <origin
+      xyz="-0.00287891807280283 0.065653037885353 -0.0776950726637979"
+      rpy="0 0 0" />
+    <parent
+      link="neckcover_link" />
+    <child
+      link="BigHolder_Link" />
+    <axis
+      xyz="-0.0397697640940247 0.999208869988605 0" />
+  </joint>
+  <link
+    name="YesHolder2_Link">
+    <inertial>
+      <origin
+        xyz="0.0203149269410792 0.0271362965390097 -0.0199908939888824"
+        rpy="0 0 0" />
+      <mass
+        value="0.309242325129277" />
+      <inertia
+        ixx="0.000212266825814768"
+        ixy="-3.05286103788847E-06"
+        ixz="7.87334009471363E-08"
+        iyy="0.000326187452054264"
+        iyz="7.13527459071949E-08"
+        izz="0.000228228400059726" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/YesHolder2_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/YesHolder2_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="YesHolder2_joint"
+    type="continuous">
+    <origin
+      xyz="-0.00916572729193776 -0.015266840259032 -0.057695072663795"
+      rpy="0 0 0" />
+    <parent
+      link="neckcover_link" />
+    <child
+      link="YesHolder2_Link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="YesHolder3_Link">
+    <inertial>
+      <origin
+        xyz="0.0060311959914825 0.0445244936257119 -0.01998650833378"
+        rpy="0 0 0" />
+      <mass
+        value="0.21367369731836" />
+      <inertia
+        ixx="0.000193898212766541"
+        ixy="-3.21440946218697E-06"
+        ixz="7.73945281530423E-08"
+        iyy="0.000310300003370088"
+        iyz="7.13098915279866E-08"
+        izz="0.000201572008010471" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/YesHolder3_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/YesHolder3_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="YesHolder3_joint"
+    type="continuous">
+    <origin
+      xyz="-0.00916572729193776 -0.015266840259032 -0.057695072663795"
+      rpy="0 0 0" />
+    <parent
+      link="neckcover_link" />
+    <child
+      link="YesHolder3_Link" />
+    <axis
+      xyz="0.999208869988605 0.0397697640940216 0" />
+  </joint>
+  <link
+    name="MotorHolder2_Link">
+    <inertial>
+      <origin
+        xyz="0.015 1.11022302462516E-16 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.00685662156823649" />
+      <inertia
+        ixx="2.2382502629635E-06"
+        ixy="2.71065228808385E-22"
+        ixz="-9.9350826820485E-23"
+        iyy="9.59940396195211E-07"
+        iyz="-4.14976191770741E-22"
+        izz="3.08391363302144E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/MotorHolder2_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/MotorHolder2_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="MotorHolder2_joint"
+    type="fixed">
+    <origin
+      xyz="-0.0239949493661168 -0.0293076079355734 -0.107995072663795"
+      rpy="0 0 0" />
+    <parent
+      link="neckcover_link" />
+    <child
+      link="MotorHolder2_Link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="MotorHolder3_Link">
+    <inertial>
+      <origin
+        xyz="1.11022302462516E-16 0 -0.0150000000000001"
+        rpy="0 0 0" />
+      <mass
+        value="0.00685662156823661" />
+      <inertia
+        ixx="3.08055428444597E-06"
+        ixy="8.44030878861362E-08"
+        ixz="-1.62759517459188E-21"
+        iyy="9.63299744770746E-07"
+        iyz="-9.78843854747166E-22"
+        izz="2.23825026296354E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/MotorHolder3_Link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://NeckAssembly_files/meshes/MotorHolder3_Link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="MotorHolder3_joint"
+    type="continuous">
+    <origin
+      xyz="0.0289130989018725 -0.0278065397762313 -0.0626950726637943"
+      rpy="0 0 0" />
+    <parent
+      link="neckcover_link" />
+    <child
+      link="MotorHolder3_Link" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+</robot>

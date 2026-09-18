@@ -34,9 +34,13 @@ JOINTS PER SIDE
 REST POSE IS roll = 3.1416, NOT ZERO. The CAD neutral is arm-straight-up.
 """
 
+import math
 import os
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import gen_neck          # noqa: E402  - the neck chain comes from ONE table
 ROOT = os.path.dirname(HERE)
 OUT = os.path.join(ROOT, "live mimic system", "humanoid_v11_atom.urdf")
 
@@ -371,7 +375,13 @@ HEADER = '''<?xml version="1.0"?>
 <robot name="humanoid_v8_atom">
 
   <mujoco>
-    <compiler meshdir="meshes36d/" balanceinertia="true" discardvisual="false"/>
+    <compiler meshdir="meshes36d/" balanceinertia="true" discardvisual="false"
+              strippath="false"/>
+    <!-- strippath MUST be false. It defaults to TRUE for URDF, which throws away
+         everything but the basename of a mesh path - fine for v11's own meshes,
+         which are bare names sitting in meshdir, but it would reduce the neck's
+         ../../NeckAssembly_files/meshes/X.STL to X.STL and then look for it in
+         meshes36d/, where it is not. The model fails to load outright. -->
   </mujoco>
 
   <!-- ATOM PALETTE, sampled from the donor model's own BaseColor maps: torso,
@@ -396,7 +406,8 @@ HEADER = '''<?xml version="1.0"?>
     <inertial><mass value="0.90"/><origin xyz="0 0 0.6163"/><inertia ixx="0.006" iyy="0.006" izz="0.001" ixy="0" ixz="0" iyz="0"/></inertial>
     <visual><geometry><box size="0.070 0.175 0.055"/></geometry><origin xyz="0 0 0.4846"/><material name="gray"/></visual>
     <collision><geometry><box size="0.070 0.175 0.055"/></geometry><origin xyz="0 0 0.4846"/></collision>
-    <visual><geometry><cylinder radius="0.012" length="0.048"/></geometry><origin xyz="0 0 0.772"/><material name="gray"/></visual>
+    <!-- The 12 mm neck stub that used to sit here is gone: the real neck from
+         NeckAssembly_files mounts at this height now. See neck() below. -->
     <!-- HEAD. Atom head lifted from Atom_Real_Steel_Model.obj (Material.005).
          Source is Y-up facing -Z, so +90 about X then +90 about Z into REP-103.
          Scaled to 143.7 mm = the DONOR's own head/stature ratio 0.1572, not the
@@ -412,17 +423,121 @@ HEADER = '''<?xml version="1.0"?>
          Material is assigned in build_humanoid_v11_scene.py, not here: URDF
          materials cannot carry a texture MuJoCo will pick up.
          Visual only and MASSLESS - the torso inertial above is untouched. -->
-    <visual><geometry><mesh filename="atom_head.obj"/></geometry><origin xyz="0.020 0 0.84208" rpy="0 -0.209440 0"/><material name="tan"/></visual>
+    <!-- The head used to be a massless visual WELDED HERE, which meant it could
+         not move. It now lives on the neck's head link - see neck(). -->
     <visual><origin xyz="0.027 0 0.660"/><geometry><box size="0.004 0.050 0.090"/></geometry><material name="chest"/></visual>
   </link>
 
 '''
 
 
+
+
+# ---------------------------------------------------------------------------
+# NECK.  The real NeckAssembly export, mounted unscaled.
+#
+# The neck CAD is fixed - it is the hardware that exists - so ATOM adapts to the
+# neck, not the other way round. Two consequences, both deliberate:
+#
+#   * IT DOES NOT FIT A 36 INCH ATOM. The mechanism is 124.8 mm tall and 164.0 mm
+#     wide, against 94.1 mm of shoulder-to-head-centre and a 143.7 mm head. Sat
+#     on the torso at true size it pushes the crown to about 1.017 m - a 40 inch
+#     robot. main() prints the exact figure every run so the number stays in
+#     front of you instead of buried here.
+#   * NOTHING IS SCALED. Shrinking the mesh would make the picture tidy and the
+#     sim meaningless: you cannot shrink a DS51. If Atom has to stay at 36 in,
+#     the servos are what has to change, and that is a CAD decision, not a
+#     generator flag.
+#
+# FRAMES. The neck CAD is Y-up; v11 is Z-up (REP-103). Rx(+90) maps
+# CAD (x, y, z) -> world (x, -z, y):
+#       CAD +Y  (the neck's own vertical)  ->  world +Z   up
+#       CAD +X                             ->  world +X   forward
+#       CAD +Z                             ->  world -Y   Atom's right
+NECK_RPY = (math.pi / 2.0, 0.0, 0.0)
+TORSO_TOP = MODULE_Z                 # 0.748, the shoulder plate height
+HEAD_SIZE_V11 = 0.1437               # unchanged from the old welded visual
+HEAD_X_NUDGE = 0.020                 # ditto: the mesh's neck stub hangs off the rear
+HEAD_PITCH = -0.209440               # ditto: -12 deg, crown band reads level
+
+
+def _rpy_to_mat(r, p, y):
+    cr, sr, cp, sp, cy, sy = (math.cos(r), math.sin(r), math.cos(p),
+                              math.sin(p), math.cos(y), math.sin(y))
+    Rz = [[cy, -sy, 0], [sy, cy, 0], [0, 0, 1]]
+    Ry = [[cp, 0, sp], [0, 1, 0], [-sp, 0, cp]]
+    Rx = [[1, 0, 0], [0, cr, -sr], [0, sr, cr]]
+    mul = lambda A, B: [[sum(A[i][k] * B[k][j] for k in range(3))
+                         for j in range(3)] for i in range(3)]
+    return mul(mul(Rz, Ry), Rx)
+
+
+def _mat_to_rpy(R):
+    p = math.asin(max(-1.0, min(1.0, -R[2][0])))
+    return (math.atan2(R[2][1], R[2][2]), p, math.atan2(R[1][0], R[0][0]))
+
+
+def _cad_to_world(v):
+    """Apply NECK_RPY to a CAD vector."""
+    R = _rpy_to_mat(*NECK_RPY)
+    return tuple(sum(R[i][k] * v[k] for k in range(3)) for i in range(3))
+
+
+def _world_to_cad(v):
+    R = _rpy_to_mat(*NECK_RPY)
+    return tuple(sum(R[k][i] * v[k] for k in range(3)) for i in range(3))
+
+
+def neck_geometry():
+    """Where the neck sits and where the head ends up. Derived, never typed in,
+    so editing STAGES in gen_neck.py moves everything consistently."""
+    lo, hi = gen_neck.neck_extent()
+    mount = (HEAD_X_NUDGE - 0.5 * (lo[0] + hi[0]),      # centre it fore/aft, then nudge
+             0.5 * (lo[2] + hi[2]),                     # centre it on the spine
+             TORSO_TOP - lo[1])                         # underside on the torso top
+    neck_top_z = mount[2] + hi[1]
+    head_centre = (HEAD_X_NUDGE, 0.0, neck_top_z + HEAD_SIZE_V11 / 2.0)
+
+    last_origin = gen_neck.JOINT_ORIGIN[gen_neck.STAGES[-1][2]]
+    pitch_world = tuple(mount[i] + _cad_to_world(last_origin)[i] for i in range(3))
+    head_off_cad = _world_to_cad(tuple(head_centre[i] - pitch_world[i] for i in range(3)))
+
+    # the head mesh must still sit at HEAD_PITCH in WORLD terms, but it now hangs
+    # off a link that carries the mount rotation, so counter-rotate it
+    Rm = _rpy_to_mat(*NECK_RPY)
+    Rw = _rpy_to_mat(0.0, HEAD_PITCH, 0.0)
+    Rl = [[sum(Rm[k][i] * Rw[k][j] for k in range(3)) for j in range(3)]
+          for i in range(3)]
+    return mount, head_off_cad, _mat_to_rpy(Rl), head_centre, neck_top_z
+
+
+def neck():
+    mount, head_off, head_rpy, _, _ = neck_geometry()
+    head_visual = (
+        '    <visual><geometry><mesh filename="atom_head.obj"/></geometry>\n'
+        f'      <origin xyz="0 0 0" rpy="{head_rpy[0]:.6f} {head_rpy[1]:.6f} '
+        f'{head_rpy[2]:.6f}"/><material name="tan"/></visual>')
+    return gen_neck.chain(parent="torso", mount_xyz=mount, mount_rpy=NECK_RPY,
+                          # relative to MESHDIR ("live mimic system/meshes36d/"),
+                          # not to the URDF - see the compiler note in HEADER
+                          mesh_rel="../../NeckAssembly_files/meshes",
+                          head_extra=head_visual, head_offset=head_off)
+
+
 def main():
     with open(OUT, "w", encoding="utf-8") as f:
-        f.write(HEADER + side("L") + "\n" + side("R") + "\n" + legs() + "</robot>\n")
+        f.write(HEADER + side("L") + "\n" + side("R") + "\n" + legs()
+                + "\n" + neck() + "\n</robot>\n")
     print("wrote", os.path.relpath(OUT, ROOT))
+    mount, _, _, head_centre, neck_top = neck_geometry()
+    crown = head_centre[2] + HEAD_SIZE_V11 / 2.0
+    print(f"  neck mounted unscaled at torso z={TORSO_TOP:.3f}, "
+          f"top of neck z={neck_top:.4f}")
+    print(f"  head centre z={head_centre[2]:.4f}, crown z={crown:.4f}")
+    print(f"  STATURE IS NOW {crown*1000:.1f} mm ({crown/0.0254:.1f} in), "
+          f"was 914.4 mm (36.0 in)")
+    print(f"  -> the neck adds {(crown-0.9144)*1000:.1f} mm. It is the hardware "
+          f"that exists, so Atom grew; nothing was scaled.")
 
 
 if __name__ == "__main__":
