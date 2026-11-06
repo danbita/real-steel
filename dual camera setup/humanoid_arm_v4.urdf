@@ -40,7 +40,7 @@
   <joint name="L_shoulder_flex" type="revolute">
     <parent link="torso"/><child link="L_shoulder_link"/>
     <origin xyz="0 0.20 0.6"/><axis xyz="0 -1 0"/>
-    <limit lower="-1.5708" upper="1.5708" effort="30" velocity="6"/>
+    <limit lower="-1.5708" upper="1.5708" effort="3.43" velocity="5.82"/>
   </joint>
   <link name="L_shoulder_link">
     <inertial><mass value="0.05"/><inertia ixx="1e-4" iyy="1e-4" izz="1e-4" ixy="0" ixz="0" iyz="0"/></inertial>
@@ -48,7 +48,7 @@
   <joint name="L_shoulder_abd" type="revolute">
     <parent link="L_shoulder_link"/><child link="L_bicep"/>
     <origin xyz="0 0 0"/><axis xyz="1 0 0"/>
-    <limit lower="-1.5708" upper="1.5708" effort="30" velocity="6"/>
+    <limit lower="-1.5708" upper="1.5708" effort="3.43" velocity="5.82"/>
   </joint>
   <link name="L_bicep">
     <visual><geometry><box size="0.055 0.055 0.20"/></geometry><origin xyz="0 0 -0.10"/>
@@ -59,7 +59,7 @@
   <joint name="L_elbow" type="revolute">
     <parent link="L_bicep"/><child link="L_forearm"/>
     <origin xyz="0 0 -0.20"/><axis xyz="0 -1 0"/>
-    <limit lower="0" upper="2.618" effort="30" velocity="6"/>
+    <limit lower="0" upper="2.618" effort="1.96" velocity="5.82"/>
   </joint>
   <link name="L_forearm">
     <visual><geometry><box size="0.045 0.045 0.18"/></geometry><origin xyz="0 0 -0.09"/>
@@ -72,7 +72,7 @@
   <joint name="R_shoulder_flex" type="revolute">
     <parent link="torso"/><child link="R_shoulder_link"/>
     <origin xyz="0 -0.20 0.6"/><axis xyz="0 -1 0"/>
-    <limit lower="-1.5708" upper="1.5708" effort="30" velocity="6"/>
+    <limit lower="-1.5708" upper="1.5708" effort="3.43" velocity="5.82"/>
   </joint>
   <link name="R_shoulder_link">
     <inertial><mass value="0.05"/><inertia ixx="1e-4" iyy="1e-4" izz="1e-4" ixy="0" ixz="0" iyz="0"/></inertial>
@@ -80,7 +80,7 @@
   <joint name="R_shoulder_abd" type="revolute">
     <parent link="R_shoulder_link"/><child link="R_bicep"/>
     <origin xyz="0 0 0"/><axis xyz="-1 0 0"/>
-    <limit lower="-1.5708" upper="1.5708" effort="30" velocity="6"/>
+    <limit lower="-1.5708" upper="1.5708" effort="3.43" velocity="5.82"/>
   </joint>
   <link name="R_bicep">
     <visual><geometry><box size="0.055 0.055 0.20"/></geometry><origin xyz="0 0 -0.10"/>
@@ -91,7 +91,7 @@
   <joint name="R_elbow" type="revolute">
     <parent link="R_bicep"/><child link="R_forearm"/>
     <origin xyz="0 0 -0.20"/><axis xyz="0 -1 0"/>
-    <limit lower="0" upper="2.618" effort="30" velocity="6"/>
+    <limit lower="0" upper="2.618" effort="1.96" velocity="5.82"/>
   </joint>
   <link name="R_forearm">
     <visual><geometry><box size="0.045 0.045 0.18"/></geometry><origin xyz="0 0 -0.09"/>

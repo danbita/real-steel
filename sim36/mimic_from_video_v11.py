@@ -276,10 +276,11 @@ def drive(seq, raw=None):
 
     r = mujoco.Renderer(m, height=H, width=W)
     sub = max(1, int(round((1 / 30.0) / m.opt.timestep)))
-    # Slew-limit the COMMAND to what the servo can actually do. The XH540 is
-    # 3.14 rad/s no-load; without this the retargeted signal asks for jumps of
-    # >100 deg in one frame and the joint can never catch up.
-    MAX_RATE = 3.0
+    # Slew-limit the COMMAND to what the servo can actually do. The HTS-35H is
+    # 5.82 rad/s no-load (sim36/servo_spec.py); 3.0 leaves margin for load.
+    # Without this the retargeted signal asks for jumps of >100 deg in one
+    # frame and the joint can never catch up.
+    from servo_spec import MAX_RATE
     step = MAX_RATE / 30.0
     # Seed EVERY driven joint with the rest pose. MuJoCo ctrl defaults to 0, and
     # roll = 0 means "arm straight up" - so any frame without a pose detection

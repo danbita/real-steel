@@ -31,7 +31,7 @@ URDF_FILE = os.path.join(here, "humanoid_arm_v4.urdf")
 UDP_ADDR = ("127.0.0.1", 5005)
 SIM_FPS = 60.0
 SMOOTH_ALPHA = 0.35
-MAX_RATE = 6.0                  # rad/s (matches the physical arm's receiver)
+MAX_RATE = 5.8                  # rad/s (matches arm_receiver.py: HTS-35H no-load)
 PENETRATION = -0.001            # contact depth (m) that counts as a collision
 
 LIMB_GROUPS = {

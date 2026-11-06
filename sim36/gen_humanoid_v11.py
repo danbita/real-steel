@@ -35,6 +35,7 @@ REST POSE IS roll = 3.1416, NOT ZERO. The CAD neutral is arm-straight-up.
 """
 
 import math
+import json
 import os
 import sys
 
@@ -43,6 +44,17 @@ sys.path.insert(0, HERE)
 import gen_neck          # noqa: E402  - the neck chain comes from ONE table
 ROOT = os.path.dirname(HERE)
 OUT = os.path.join(ROOT, "live mimic system", "humanoid_v11_atom.urdf")
+
+from servo_spec import SHOULDER, ELBOW   # noqa: E402
+
+# <limit effort velocity> for the servo-driven joints: datasheet stall torque
+# and no-load speed. MuJoCo DOES read effort - it becomes the joint's
+# actuatorfrcrange, a hard clamp on actuator torque at that joint - so this is
+# a real physics number, not documentation. (It was effort="3.0" here while
+# the scene's actuators claimed 10.6 N*m; the 3.0 clamp is what actually ran.)
+# velocity is not used by MuJoCo; ROS / other URDF consumers read it.
+SH_LIM = f'effort="{SHOULDER.stall_nm:.2f}" velocity="{SHOULDER.speed:.2f}"'
+EL_LIM = f'effort="{ELBOW.stall_nm:.2f}" velocity="{ELBOW.speed:.2f}"'
 
 SHOULDER_Y = 0.1184      # biacromial/2 at 36 in; spine surface sits 89 mm inboard
 MODULE_Z = 0.748         # shoulder (acromion) height = 0.818 x stature
@@ -54,25 +66,19 @@ BICEP_X_OFF = -0.018392   # 37.7 mm x the 0.531 arm scale
 
 M = f"0 0 -{CZ}"
 
-# Left-hand values, measured by sim/shoulder_v6_prep.py. The right module is a
-# true mirror, so its COM y and its ixy / iyz products flip sign - which is
-# exactly what the prep script measured on the mirrored meshes.
+# Left-hand values, measured by sim36/prep_v11.py and read straight from its
+# output so the two can never drift (they used to be pasted in by hand). The
+# right module is a true mirror, so its COM y and its ixy / iyz products flip
+# sign - which is exactly what the prep script measured on the mirrored meshes.
+# Servo bodies inside these links are pinned to the datasheet mass in
+# sim36/servo_spec.py (HTS-35H, 64 g).
+with open(os.path.join(HERE, "v11_links.json")) as _f:
+    _LINKS = json.load(_f)
 INERTIA_L = {
-    # shoulder_v6, integrated from its meshes by sim36/prep_v11.py
-    "base": ((0.000000, -0.068431, 0.003471), 0.234859,
-             dict(ixx=0.000179494, ixy=-0.000000000, ixz=-0.000000000,
-                  iyy=0.000170123, iyz=-0.000006131, izz=0.000201799)),
-    "carrier": ((0.002497, -0.008889, -0.004951), 0.153571,
-             dict(ixx=0.000061856, ixy=-0.000003409, ixz=0.000008073,
-                  iyy=0.000102863, iyz=0.000004852, izz=0.000110884)),
-    "yoke": ((0.000429, 0.002949, 0.061150), 0.248273,
-             dict(ixx=0.000285351, ixy=-0.000000319, ixz=0.000004431,
-                  iyy=0.000413733, iyz=0.000005057, izz=0.000264074)),
-    "plate": ((0.000000, 0.000000, 0.093989), 0.050993,
-             dict(ixx=0.000016039, ixy=-0.000000000, ixz=0.000000000,
-                  iyy=0.000013838, iyz=0.000000000, izz=0.000022592)),
+    k: (tuple(_LINKS[k]["rel"]), _LINKS[k]["mass"],
+        {a: _LINKS[k][a] for a in ("ixx", "ixy", "ixz", "iyy", "iyz", "izz")})
+    for k in ("base", "carrier", "yoke", "plate")
 }
-
 
 
 def inertia(key, side):
@@ -234,7 +240,7 @@ ARM = '''  <!-- ATOM arm, unchanged below the adapter -->
     <parent link="{s}_bicep"/><child link="{s}_forearm"/>
     <origin xyz="-0.000015060 0.020049616 -0.094646582" rpy="1.5707963 0 0"/>
     <axis xyz="-1 0 0"/>
-    <limit lower="0" upper="2.0944" effort="3.0" velocity="4.2"/>
+    <limit lower="0" upper="2.0944" {el_lim}/>
     <dynamics damping="0.15" friction="0.05"/>
   </joint>
   <link name="{s}_forearm">
@@ -281,7 +287,7 @@ def side(s):
   <joint name="{s}_shoulder_pitch" type="revolute">
     <parent link="{s}_shoulder_base"/><child link="{s}_shoulder_carrier"/>
     <origin xyz="0 0 0"/><axis xyz="0 -1 0"/>
-    <limit lower="-1.0472" upper="3.1416" effort="3.0" velocity="4.2"/>
+    <limit lower="-1.0472" upper="3.1416" {SH_LIM}/>
     <dynamics damping="0.06" friction="0.02"/>
   </joint>
 
@@ -290,7 +296,7 @@ def side(s):
   <joint name="{s}_shoulder_roll" type="revolute">
     <parent link="{s}_shoulder_carrier"/><child link="{s}_shoulder_yoke"/>
     <origin xyz="0 0 0"/><axis xyz="{roll_axis}"/>
-    <limit lower="-0.4363" upper="2.6180" effort="3.0" velocity="4.2"/>
+    <limit lower="-0.4363" upper="2.6180" {SH_LIM}/>
     <dynamics damping="0.06" friction="0.02"/>
   </joint>
 
@@ -302,12 +308,12 @@ def side(s):
          swept. With the twist zero corrected the solved range is only
          -43..+35 deg, so this costs nothing and keeps the live receiver
          inside verified travel. No slip ring: leave a service loop. -->
-    <limit lower="-1.5708" upper="1.5708" effort="3.0" velocity="4.2"/>
+    <limit lower="-1.5708" upper="1.5708" {SH_LIM}/>
     <dynamics damping="0.04" friction="0.02"/>
   </joint>
 
 {link_block(s, "plate", "shoulder_plate")}
-{ARM.format(s=s, bx=BICEP_X_OFF, by=by, bz=BICEP_Z, mat=mat, tw0=tw0)}'''
+{ARM.format(s=s, bx=BICEP_X_OFF, by=by, bz=BICEP_Z, mat=mat, tw0=tw0, el_lim=EL_LIM)}'''
 
 
 def legs():
@@ -349,7 +355,7 @@ def legs():
     return out
 
 
-HEADER = '''<?xml version="1.0"?>
+HEADER_T = '''<?xml version="1.0"?>
 <!-- GENERATED by sim/gen_humanoid_v11.py . Do not hand-edit; edit the generator.
 
      humanoid_v11_atom.urdf : shoulder_v6 (3 DOF, real bearings) + the ATOM arm.
@@ -358,16 +364,16 @@ HEADER = '''<?xml version="1.0"?>
      unrotated and share sign conventions. v6 had to rotate the right module 180
      deg about Z, which flipped the arm fore/aft and needed a patched elbow axis.
 
-     Module mass 933.5 g/side (was 771 g for v2) - the pitch and twist bearings
-     and their retainers. ATOM arm 586 g/side.
+     Shoulder module masses come from sim36/prep_v11.py (v11_links.json).
 
-     SERVOS ARE NOW REAL PARTS, NOT PLACEHOLDERS:
-       shoulder pitch/roll/twist : Dynamixel XH540-W270, 10.6 Nm stall, 3.14 rad/s
-       elbow                     : Dynamixel XH430-W350,  4.8 Nm stall, 3.40 rad/s
-     Earlier versions used the MG996R's 9 Nm STALL figure as if it were a working
-     limit. It is not - hobby servos should run near 1/3 of stall continuously.
-     The CAD (cad/shoulder_v6) still has MG996R-sized pockets; the servo envelope
-     is parameterised there and needs re-exporting for the 65x30x48 Dynamixels.
+     SERVOS ARE REAL PARTS (sim36/servo_spec.py - change servos THERE):
+       shoulder pitch/roll/twist : {SH}
+       elbow                     : {EL}
+     Effort = datasheet stall-class torque, velocity = no-load speed, both at
+     11.1 V. Hobby servos should run near 1/3 of that torque continuously.
+     The CAD (cad/shoulder_v6) is cut for the HTS-35H; the meshes in
+     meshes36d/shoulder_v6 are exported from it. Every servo-driven range
+     below fits inside the 240 deg servo travel.
 
      Travel limits below are SERVO limits and MUST be re-measured by collision
      sweep; v2's advertised figures did not survive that test.
@@ -522,6 +528,9 @@ def neck():
                           # not to the URDF - see the compiler note in HEADER
                           mesh_rel="../../NeckAssembly_files/meshes",
                           head_extra=head_visual, head_offset=head_off)
+
+
+HEADER = HEADER_T.replace("{SH}", repr(SHOULDER)).replace("{EL}", repr(ELBOW))
 
 
 def main():

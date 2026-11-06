@@ -30,7 +30,11 @@ ARM_SIDE = "R"              # "R": your right arm drives it; "L": your left
 UDP_ADDR = ("127.0.0.1", 5005)
 SIM_FPS = 60.0
 SMOOTH_ALPHA = 0.35
-MAX_RATE = 6.0              # rad/s — keep conservative: this maps to hardware
+# rad/s. Maps to hardware, so it must not exceed the servo: the Hiwonder
+# HTS-35H (shoulder) / HTS-20H (elbow) are 0.18 s/60 deg = 5.82 rad/s no-load
+# at 11.1 V (sim36/servo_spec.py). Was 6.0, just past that; 5.8 keeps the same
+# feel without commanding speed the real arm cannot produce.
+MAX_RATE = 5.8
 
 # robot joint <- key in the incoming packet
 MAPPING = {

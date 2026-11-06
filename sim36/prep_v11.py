@@ -5,8 +5,9 @@ prep_v11.py - mesh + mass prep for the v11 body (36 in skeleton + shoulder_v6).
 
 shoulder_v6 is shoulder_v3 resized: same architecture, same concurrent axes at
 C = (0, 0, 100) in the module file, but drawn around the 50 x 58 mm bicep
-instead of the old 94 x 109 one, and around a MEASURED Feetech STS3215 rather
-than an MG996R.
+instead of the old 94 x 109 one. Its servo pockets are cut for the Hiwonder
+HTS-35H (ear-deck mount, see cad/shoulder_v6/build_shoulder_v6_cq.py); the
+servo's mass comes from sim36/servo_spec.py.
 
 The module is mounted INVERTED in the robot (rotated 180 deg about Y), because
 v6 is exported in v3's neutral pose with the arm straight UP. Inverting it makes
@@ -17,8 +18,8 @@ that end of the travel.
 
     upper arm = module 111.0 + bicep chain = 205.3 mm  (target 170.1)
 
-That 35 mm overshoot is real. Two causes stack up: the true STS3215 (45.4 mm
-long, spline 12.5 mm off centre, vs the 40/10 MG996R v3 assumed), and the twist
+That overshoot is real. Two causes stack up: the servo envelope (first the
+STS3215, now the HTS-35H with its 54.38 mm ear plate), and the twist
 servo raised to SRV_T_Z=180 - the only stack that clears servo R through the
 FULL pitch x roll envelope (pitch 180 x roll 140+ combos). It is 3.9% of
 stature: visible if you look for it, and the price of the unrestricted ROM.
@@ -33,6 +34,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 from shoulder_prep import read_stl, write_stl, mass_props, PLA, STEEL, SERVO, HORN
+from servo_spec import SHOULDER
 
 ARM_SRC = os.path.join(ROOT, "live mimic system", "meshes")
 V6_SRC = os.path.join(ROOT, "cad", "shoulder_v6")
@@ -50,9 +52,10 @@ ORIG_MASS = {"bicep_Link.STL": 0.245418330630813, "elbow_Link.STL": 0.1581788331
              "big_gear_Link.STL": 0.0382194359196154,
              "small_gear_Link.STL": 0.00629688353529975}
 
-# the real STS3215 weighs 55 g. Deriving it from a PLA-ish density gets 70 g,
-# and there are six of them on the robot, so the error is worth removing.
-SERVO_MASS = 0.055
+# Pin each shoulder servo to its DATASHEET mass (HTS-35H: 64 g) instead of
+# deriving it from a density - the meshes include the ear plate and boss, so a
+# density guess drifts. Was 0.055 for the STS3215.
+SERVO_MASS = SHOULDER.mass
 
 V6_PARTS = ["mount", "servoP_body", "servoP_shaft", "pitch_retainer",
             "carrier", "servoR_body", "servoR_shaft", "roll_idler",
@@ -130,7 +133,7 @@ def main():
             v, c, I = mass_props(tri)
             rho = V6_DENS[n]
             if n.endswith("_body") and n.startswith("servo"):
-                rho = SERVO_MASS / v                 # pin servos to the real 55 g
+                rho = SERVO_MASS / v                 # pin servos to the datasheet mass
             m = v * rho
             tot += m
             com += m * c

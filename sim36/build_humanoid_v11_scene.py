@@ -24,22 +24,33 @@ ROOT = os.path.dirname(HERE)
 URDF = os.path.join(ROOT, "live mimic system", "humanoid_v11_atom.urdf")
 OUT = os.path.join(ROOT, "sim36", "humanoid_v11_scene.xml")
 
+from servo_spec import SHOULDER, ELBOW
+
+# Actuator torque ceiling = the servo's datasheet stall-class torque
+# (sim36/servo_spec.py). Was 10.6 / 4.8 N*m - Dynamixel XH540 / XH430 figures
+# left over from before the CAD moved to the Hiwonder HTS-35H. (The URDF's
+# effort="3.0" was clamping every arm joint to 3 N*m underneath that anyway;
+# both numbers now come from the same servo_spec values.)
+SH_NM, EL_NM = round(SHOULDER.stall_nm, 3), round(ELBOW.stall_nm, 3)
+LEG_NM = 4.8          # legs are still the rig's fictional joints - unchanged
 DRIVEN = [
-    ("L_shoulder_pitch", 10.6), ("L_shoulder_roll", 10.6),
-    ("L_shoulder_twist", 10.6), ("L_elbow", 4.8),
-    ("R_shoulder_pitch", 10.6), ("R_shoulder_roll", 10.6),
-    ("R_shoulder_twist", 10.6), ("R_elbow", 4.8),
-    ("L_hip_flex", 4.8), ("L_hip_abd", 4.8), ("L_knee", 4.8),
-    ("R_hip_flex", 4.8), ("R_hip_abd", 4.8), ("R_knee", 4.8),
-    # Neck. Without actuators these joints exist but are unactuated, so the head
+    ("L_shoulder_pitch", SH_NM), ("L_shoulder_roll", SH_NM),
+    ("L_shoulder_twist", SH_NM), ("L_elbow", EL_NM),
+    ("R_shoulder_pitch", SH_NM), ("R_shoulder_roll", SH_NM),
+    ("R_shoulder_twist", SH_NM), ("R_elbow", EL_NM),
+    ("L_hip_flex", LEG_NM), ("L_hip_abd", LEG_NM), ("L_knee", LEG_NM),
+    ("R_hip_flex", LEG_NM), ("R_hip_abd", LEG_NM), ("R_knee", LEG_NM),
+    # Neck: its own servo (DS51 class), not part of the HTS arm cart - unchanged.
+    # Without actuators these joints exist but are unactuated, so the head
     # simply falls over under gravity the moment the sim starts.
     ("neck_yaw", 4.0), ("neck_pitch", 4.0),
 ]
 
 # Real servos on the shoulder and elbow; the legs are still the rig's own
 # fictional joints and just need to track.
-# STS3215 class: 3 Nm stall. A 63 g arm needs almost nothing, so gains are
-# far lower than the person-scale model.
+# HTS-35H shoulder 3.43 N*m, HTS-20H elbow 1.96 N*m. A light arm needs far less
+# than that, so the gains stay well below the person-scale model and the
+# forcerange is only reached on contact or a hard stop.
 GAINS = {"elbow": (6.0, 0.3), "shoulder": (16.0, 0.5), "neck": (8.0, 0.4),
          "default": (25.0, 1.2)}
 
@@ -269,13 +280,17 @@ def main():
         for g2 in arm_distal + fore:          # arm vs torso, and vs the housings
             for g1 in torso_g + module_g:
                 pair(g1, g2)
-        # The yoke swings past the mount on every roll move. This pair was
-        # missing, and it hid a 4mm interference at almost every roll angle.
-        # The CARRIER is deliberately still excluded: its journal spins inside
-        # the cradle bore, which is a bearing, not a clash.
-        for g2 in cg.get(f"{s}_shoulder_yoke", []):
-            for g1 in module_g:
-                pair(g1, g2)
+        # YOKE vs MOUNT is NOT paired any more. It was added when an older
+        # module really did interfere there, but on shoulder_v6 the CAD
+        # checker measures the TRUE surfaces and gets >= 4.7 mm (yoke) and
+        # >= 4.1 mm (servo T) to the mount over the whole travel at 5 deg
+        # roll steps. MuJoCo only has box slabs around those curved parts, and
+        # the boxes overlapped by 1-11 mm on most roll angles between ~30 and
+        # 65 deg - a contact that does not exist, which pinned the arm
+        # mid-abduction in the live sim until the servo overpowered it and
+        # snapped through. Same rule as the plate/yoke interface above: the
+        # CAD checker owns intra-module clearance (re-run
+        # sim36/interference_check.py after any module change).
         for g2 in arm_distal:                 # bicep vs its own module housing
             for g1 in cg.get(f"{s}_shoulder_carrier", []):
                 pair(g1, g2)

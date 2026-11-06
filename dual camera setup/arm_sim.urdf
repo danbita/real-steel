@@ -48,7 +48,7 @@
   <joint name="shoulder_flex" type="revolute">
     <parent link="arm_base"/><child link="shoulder_link"/>
     <origin xyz="0 0 0"/><axis xyz="0 -1 0"/>
-    <limit lower="-1.5708" upper="1.5708" effort="30" velocity="6"/>
+    <limit lower="-1.5708" upper="1.5708" effort="3.43" velocity="5.82"/>
   </joint>
   <link name="shoulder_link">
     <inertial><mass value="0.05"/><inertia ixx="1e-4" iyy="1e-4" izz="1e-4" ixy="0" ixz="0" iyz="0"/></inertial>
@@ -57,7 +57,7 @@
   <joint name="shoulder_abd" type="revolute">
     <parent link="shoulder_link"/><child link="bicep"/>
     <origin xyz="0 0 0"/><axis xyz="1 0 0"/>
-    <limit lower="-1.5708" upper="1.5708" effort="30" velocity="6"/>
+    <limit lower="-1.5708" upper="1.5708" effort="3.43" velocity="5.82"/>
   </joint>
 
   <!-- bicep = upper segment (bicep_Link, 0.245 kg; export puts the elbow
@@ -76,7 +76,7 @@
   <joint name="elbow" type="revolute">
     <parent link="bicep"/><child link="forearm"/>
     <origin xyz="0 0 -0.20"/><axis xyz="0 -1 0"/>
-    <limit lower="0" upper="2.618" effort="30" velocity="6"/>
+    <limit lower="0" upper="2.618" effort="1.96" velocity="5.82"/>
   </joint>
   <link name="forearm">
     <visual>

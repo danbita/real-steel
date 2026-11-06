@@ -7,16 +7,16 @@
      unrotated and share sign conventions. v6 had to rotate the right module 180
      deg about Z, which flipped the arm fore/aft and needed a patched elbow axis.
 
-     Module mass 933.5 g/side (was 771 g for v2) - the pitch and twist bearings
-     and their retainers. ATOM arm 586 g/side.
+     Shoulder module masses come from sim36/prep_v11.py (v11_links.json).
 
-     SERVOS ARE NOW REAL PARTS, NOT PLACEHOLDERS:
-       shoulder pitch/roll/twist : Dynamixel XH540-W270, 10.6 Nm stall, 3.14 rad/s
-       elbow                     : Dynamixel XH430-W350,  4.8 Nm stall, 3.40 rad/s
-     Earlier versions used the MG996R's 9 Nm STALL figure as if it were a working
-     limit. It is not - hobby servos should run near 1/3 of stall continuously.
-     The CAD (cad/shoulder_v6) still has MG996R-sized pockets; the servo envelope
-     is parameterised there and needs re-exporting for the 65x30x48 Dynamixels.
+     SERVOS ARE REAL PARTS (sim36/servo_spec.py - change servos THERE):
+       shoulder pitch/roll/twist : Hiwonder HTS-35H: 3.43 N*m, 5.82 rad/s, 64 g, 240 deg
+       elbow                     : Hiwonder HTS-20H: 1.96 N*m, 5.82 rad/s, 58 g, 240 deg
+     Effort = datasheet stall-class torque, velocity = no-load speed, both at
+     11.1 V. Hobby servos should run near 1/3 of that torque continuously.
+     The CAD (cad/shoulder_v6) is cut for the HTS-35H; the meshes in
+     meshes36d/shoulder_v6 are exported from it. Every servo-driven range
+     below fits inside the 240 deg servo travel.
 
      Travel limits below are SERVO limits and MUST be re-measured by collision
      sweep; v2's advertised figures did not survive that test.
@@ -85,10 +85,10 @@
 
   <link name="L_shoulder_base">
     <inertial>
-      <origin xyz="0.000000 -0.068431 0.003471"/>
-      <mass value="0.234859"/>
-      <inertia ixx="0.000179494" ixy="-0.000000000" ixz="-0.000000000"
-               iyy="0.000170123" iyz="-0.000006131" izz="0.000201799"/>
+      <origin xyz="0.000000 -0.068359 0.003709"/>
+      <mass value="0.243859"/>
+      <inertia ixx="0.000182393" ixy="-0.000000000" ixz="-0.000000000"
+               iyy="0.000172061" iyz="-0.000006230" izz="0.000203361"/>
     </inertial>
     <visual><origin xyz="0 0 -0.1"/><geometry><mesh filename="shoulder_v6/mount.stl"/></geometry></visual>
     <visual><origin xyz="0 0 -0.1"/><geometry><mesh filename="shoulder_v6/servoP_body.stl"/></geometry></visual>
@@ -106,16 +106,16 @@
   <joint name="L_shoulder_pitch" type="revolute">
     <parent link="L_shoulder_base"/><child link="L_shoulder_carrier"/>
     <origin xyz="0 0 0"/><axis xyz="0 -1 0"/>
-    <limit lower="-1.0472" upper="3.1416" effort="3.0" velocity="4.2"/>
+    <limit lower="-1.0472" upper="3.1416" effort="3.43" velocity="5.82"/>
     <dynamics damping="0.06" friction="0.02"/>
   </joint>
 
   <link name="L_shoulder_carrier">
     <inertial>
-      <origin xyz="0.002497 -0.008889 -0.004951"/>
-      <mass value="0.153571"/>
-      <inertia ixx="0.000061856" ixy="-0.000003409" ixz="0.000008073"
-               iyy="0.000102863" iyz="0.000004852" izz="0.000110884"/>
+      <origin xyz="0.003025 -0.008397 -0.005226"/>
+      <mass value="0.162571"/>
+      <inertia ixx="0.000064315" ixy="-0.000004129" ixz="0.000008465"
+               iyy="0.000106351" iyz="0.000005227" izz="0.000113856"/>
     </inertial>
     <visual><origin xyz="0 0 -0.1"/><geometry><mesh filename="shoulder_v6/servoP_shaft.stl"/></geometry></visual>
     <visual><origin xyz="0 0 -0.1"/><geometry><mesh filename="shoulder_v6/carrier.stl"/></geometry></visual>
@@ -134,16 +134,16 @@
   <joint name="L_shoulder_roll" type="revolute">
     <parent link="L_shoulder_carrier"/><child link="L_shoulder_yoke"/>
     <origin xyz="0 0 0"/><axis xyz="-1 0 0"/>
-    <limit lower="-0.4363" upper="2.6180" effort="3.0" velocity="4.2"/>
+    <limit lower="-0.4363" upper="2.6180" effort="3.43" velocity="5.82"/>
     <dynamics damping="0.06" friction="0.02"/>
   </joint>
 
   <link name="L_shoulder_yoke">
     <inertial>
-      <origin xyz="0.000429 0.002949 0.061150"/>
-      <mass value="0.248273"/>
-      <inertia ixx="0.000285351" ixy="-0.000000319" ixz="0.000004431"
-               iyy="0.000413733" iyz="0.000005057" izz="0.000264074"/>
+      <origin xyz="0.000414 0.003192 0.060761"/>
+      <mass value="0.257273"/>
+      <inertia ixx="0.000289354" ixy="-0.000000293" ixz="0.000004390"
+               iyy="0.000416339" iyz="0.000005741" izz="0.000266075"/>
     </inertial>
     <visual><origin xyz="0 0 -0.1"/><geometry><mesh filename="shoulder_v6/servoR_shaft.stl"/></geometry></visual>
     <visual><origin xyz="0 0 -0.1"/><geometry><mesh filename="shoulder_v6/yoke.stl"/></geometry></visual>
@@ -167,7 +167,7 @@
          swept. With the twist zero corrected the solved range is only
          -43..+35 deg, so this costs nothing and keeps the live receiver
          inside verified travel. No slip ring: leave a service loop. -->
-    <limit lower="-1.5708" upper="1.5708" effort="3.0" velocity="4.2"/>
+    <limit lower="-1.5708" upper="1.5708" effort="3.43" velocity="5.82"/>
     <dynamics damping="0.04" friction="0.02"/>
   </joint>
 
@@ -234,7 +234,7 @@
     <parent link="L_bicep"/><child link="L_forearm"/>
     <origin xyz="-0.000015060 0.020049616 -0.094646582" rpy="1.5707963 0 0"/>
     <axis xyz="-1 0 0"/>
-    <limit lower="0" upper="2.0944" effort="3.0" velocity="4.2"/>
+    <limit lower="0" upper="2.0944" effort="1.96" velocity="5.82"/>
     <dynamics damping="0.15" friction="0.05"/>
   </joint>
   <link name="L_forearm">
@@ -267,10 +267,10 @@
 
   <link name="R_shoulder_base">
     <inertial>
-      <origin xyz="0.000000 0.068431 0.003471"/>
-      <mass value="0.234859"/>
-      <inertia ixx="0.000179494" ixy="0.000000000" ixz="-0.000000000"
-               iyy="0.000170123" iyz="0.000006131" izz="0.000201799"/>
+      <origin xyz="0.000000 0.068359 0.003709"/>
+      <mass value="0.243859"/>
+      <inertia ixx="0.000182393" ixy="0.000000000" ixz="-0.000000000"
+               iyy="0.000172061" iyz="0.000006230" izz="0.000203361"/>
     </inertial>
     <visual><origin xyz="0 0 -0.1"/><geometry><mesh filename="shoulder_v6/mount_r.stl"/></geometry></visual>
     <visual><origin xyz="0 0 -0.1"/><geometry><mesh filename="shoulder_v6/servoP_body_r.stl"/></geometry></visual>
@@ -288,16 +288,16 @@
   <joint name="R_shoulder_pitch" type="revolute">
     <parent link="R_shoulder_base"/><child link="R_shoulder_carrier"/>
     <origin xyz="0 0 0"/><axis xyz="0 -1 0"/>
-    <limit lower="-1.0472" upper="3.1416" effort="3.0" velocity="4.2"/>
+    <limit lower="-1.0472" upper="3.1416" effort="3.43" velocity="5.82"/>
     <dynamics damping="0.06" friction="0.02"/>
   </joint>
 
   <link name="R_shoulder_carrier">
     <inertial>
-      <origin xyz="0.002497 0.008889 -0.004951"/>
-      <mass value="0.153571"/>
-      <inertia ixx="0.000061856" ixy="0.000003409" ixz="0.000008073"
-               iyy="0.000102863" iyz="-0.000004852" izz="0.000110884"/>
+      <origin xyz="0.003025 0.008397 -0.005226"/>
+      <mass value="0.162571"/>
+      <inertia ixx="0.000064315" ixy="0.000004129" ixz="0.000008465"
+               iyy="0.000106351" iyz="-0.000005227" izz="0.000113856"/>
     </inertial>
     <visual><origin xyz="0 0 -0.1"/><geometry><mesh filename="shoulder_v6/servoP_shaft_r.stl"/></geometry></visual>
     <visual><origin xyz="0 0 -0.1"/><geometry><mesh filename="shoulder_v6/carrier_r.stl"/></geometry></visual>
@@ -316,16 +316,16 @@
   <joint name="R_shoulder_roll" type="revolute">
     <parent link="R_shoulder_carrier"/><child link="R_shoulder_yoke"/>
     <origin xyz="0 0 0"/><axis xyz="1 0 0"/>
-    <limit lower="-0.4363" upper="2.6180" effort="3.0" velocity="4.2"/>
+    <limit lower="-0.4363" upper="2.6180" effort="3.43" velocity="5.82"/>
     <dynamics damping="0.06" friction="0.02"/>
   </joint>
 
   <link name="R_shoulder_yoke">
     <inertial>
-      <origin xyz="0.000429 -0.002949 0.061150"/>
-      <mass value="0.248273"/>
-      <inertia ixx="0.000285351" ixy="0.000000319" ixz="0.000004431"
-               iyy="0.000413733" iyz="-0.000005057" izz="0.000264074"/>
+      <origin xyz="0.000414 -0.003192 0.060761"/>
+      <mass value="0.257273"/>
+      <inertia ixx="0.000289354" ixy="0.000000293" ixz="0.000004390"
+               iyy="0.000416339" iyz="-0.000005741" izz="0.000266075"/>
     </inertial>
     <visual><origin xyz="0 0 -0.1"/><geometry><mesh filename="shoulder_v6/servoR_shaft_r.stl"/></geometry></visual>
     <visual><origin xyz="0 0 -0.1"/><geometry><mesh filename="shoulder_v6/yoke_r.stl"/></geometry></visual>
@@ -349,7 +349,7 @@
          swept. With the twist zero corrected the solved range is only
          -43..+35 deg, so this costs nothing and keeps the live receiver
          inside verified travel. No slip ring: leave a service loop. -->
-    <limit lower="-1.5708" upper="1.5708" effort="3.0" velocity="4.2"/>
+    <limit lower="-1.5708" upper="1.5708" effort="3.43" velocity="5.82"/>
     <dynamics damping="0.04" friction="0.02"/>
   </joint>
 
@@ -416,7 +416,7 @@
     <parent link="R_bicep"/><child link="R_forearm"/>
     <origin xyz="-0.000015060 0.020049616 -0.094646582" rpy="1.5707963 0 0"/>
     <axis xyz="-1 0 0"/>
-    <limit lower="0" upper="2.0944" effort="3.0" velocity="4.2"/>
+    <limit lower="0" upper="2.0944" effort="1.96" velocity="5.82"/>
     <dynamics damping="0.15" friction="0.05"/>
   </joint>
   <link name="R_forearm">
