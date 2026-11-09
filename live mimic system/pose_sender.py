@@ -21,6 +21,13 @@ What's new in v3:
   - Visibility gates now have hysteresis (on > 0.7, off < 0.5) so a joint at
     the threshold can't flicker.
 
+Performer tracking (PersonTracker, one per camera - import it for multi-camera):
+  - Start (and press r) with the performer ALONE in view: they are found on
+    the full frame, then MediaPipe only ever looks at a crop around them.
+  - The crop (cyan box) moves only when they near its edge. If MediaPipe jumps
+    onto someone else inside the crop, the result is dropped and the box turns
+    red. Gone for LOST_S seconds -> full-frame search again.
+
 Convention sent over the wire (matches humanoid_v3.urdf exactly):
   *_flex     0 = limb hanging down, positive = forward
   *_abd      0 = limb hanging down, positive = out to the side (both sides)
@@ -35,6 +42,7 @@ os.environ["OPENCV_AVFOUNDATION_SKIP_AUTH"] = "1"
 import json
 import math
 import socket
+import threading
 import time
 import urllib.request
 
@@ -58,6 +66,20 @@ UDP_ADDR = ("127.0.0.1", 5005)
 VIS_ON, VIS_OFF = 0.7, 0.5      # gate hysteresis thresholds
 DEADBAND = 0.03                 # rad (~1.7 deg): smaller changes aren't motion
 SWAP_MARGIN = 0.05              # meters, for the L/R swap continuity test
+
+# PERFORMER TRACKING (see PersonTracker). Find the performer once on the full
+# frame, then run MediaPipe num_poses=1 on a crop around them. Sizes are in
+# torso scales (pose_signature), so they follow the person's distance.
+# Don't raise num_poses here: 2 poses + a lock measured 98.7 mm jitter and
+# 6.4 joint-count flickers/s vs 6.8 mm / 0 for a 1-pose crop (tests/crop_check.py).
+CROP_W, CROP_H = 6.0, 8.0       # minimum crop size around the torso centre
+CROP_MARGIN = 1.0               # padding around the visible landmarks
+CROP_MIN_PX = 160               # never hand MediaPipe a smaller crop than this
+CROP_EDGE = 0.08                # landmark this close to a crop edge -> move crop
+CROP_GROW, CROP_SHRINK = 1.15, 0.6   # re-fit when the needed size changes this much
+JUMP_GATE = 1.0                 # torso-centre jump (torso scales) = someone else
+JUMP_SCALE = (0.6, 1.6)         # allowed size ratio vs the last accepted result
+LOST_S = 2.0                    # no accepted result this long -> full-frame search
 
 # One Euro filter tuning: raise OE_MIN_CUTOFF if idle drift remains,
 # raise OE_BETA if fast motion feels laggy.
@@ -480,34 +502,245 @@ def frame_angles(world, vis, gates):
 
 
 # ---------------------------------------------------------------------------
-# MediaPipe live stream plumbing
+# Performer tracking + MediaPipe live stream plumbing
 # ---------------------------------------------------------------------------
-latest = {"img": None, "world": None, "vis": None, "stamp": 0.0}
+# landmarks that decide whether the performer still fits the crop
+TRACK_PTS = [NOSE, L_SHOULDER, R_SHOULDER, L_ELBOW, R_ELBOW, L_WRIST, R_WRIST,
+             L_HIP, R_HIP, L_KNEE, R_KNEE, L_ANKLE, R_ANKLE]
 
 
-def on_result(result, output_image, timestamp_ms):
-    try:
-        if result.pose_landmarks and result.pose_world_landmarks:
-            img = result.pose_landmarks[0]
-            wld = result.pose_world_landmarks[0]
-            latest["img"] = np.array([[lm.x, lm.y] for lm in img])
-            latest["world"] = np.array([[lm.x, lm.y, lm.z] for lm in wld])
-            latest["vis"] = np.array([lm.visibility for lm in img])
-            latest["stamp"] = time.time()
-    except Exception:
-        pass
+def pose_signature(img, hips_in=None, min_scale=0.02):
+    """(centre, scale) of a body in image coords (normalised or pixels). Centre
+    is the torso centre (shoulders + hips, or shoulders alone if the hips are
+    not in the image); scale is the larger of shoulder width and half the torso
+    length, so a person turned side-on doesn't collapse to scale ~0.
+    hips_in: were both hips inside the image the model saw? Default: both
+    inside [0, 1], i.e. img is normalised to that image."""
+    sh = 0.5 * (img[L_SHOULDER] + img[R_SHOULDER])
+    sw = float(np.linalg.norm(img[L_SHOULDER] - img[R_SHOULDER]))
+    if hips_in is None:
+        hips = img[[L_HIP, R_HIP]]
+        hips_in = bool(np.all((hips >= 0.0) & (hips <= 1.0)))
+    if hips_in:
+        hp = 0.5 * (img[L_HIP] + img[R_HIP])
+        centre = 0.5 * (sh + hp)
+        scale = max(sw, 0.5 * float(np.linalg.norm(sh - hp)))
+    else:
+        centre, scale = sh, sw
+    return centre, max(scale, min_scale)
 
 
-def make_landmarker():
-    options = vision.PoseLandmarkerOptions(
-        base_options=mp_tasks.BaseOptions(model_asset_path=MODEL_PATH),
-        running_mode=vision.RunningMode.LIVE_STREAM,
-        result_callback=on_result,
-        num_poses=1,
-        min_pose_detection_confidence=0.5,
-        min_tracking_confidence=0.5,
-    )
-    return vision.PoseLandmarker.create_from_options(options)
+class PersonTracker:
+    """Follow ONE performer in ONE camera. Make one per camera.
+
+    SEARCH: MediaPipe (num_poses=1) runs on the full frame and the first body
+    with visible shoulders becomes the performer. This assumes they are alone
+    in view at startup and after reset().
+    TRACK: MediaPipe runs on a crop around the performer, so people outside it
+    are never seen. The crop moves only when a landmark nears its edge or the
+    size the body needs changes a lot (CROP_GROW / CROP_SHRINK): a stable crop
+    keeps MediaPipe's own frame-to-frame tracking smooth.
+    JUMP CHECK: a result whose torso centre moved more than JUMP_GATE torso
+    scales from the last accepted one, or whose size ratio is outside
+    JUMP_SCALE, is MediaPipe re-detecting onto someone else (a walker in front
+    of the performer). It is dropped and the crop is held where it was. There
+    is no motion prediction: the reference is simply the last accepted result.
+    No accepted result for LOST_S -> back to SEARCH (performer left).
+
+    Per frame: submit(frame). Then latest() is the newest accepted result or
+    None: dict(img=(33,2) full-frame normalised xy, world=(33,3), vis=(33,),
+    inview=(33,) bool - landmark inside the crop the model actually saw -
+    stamp=time.time() of acceptance).
+    `generation` increments on every new acquisition, so callers can reset
+    per-person state (bone lengths, swap guards). reset() is safe from any
+    thread. Results arrive on MediaPipe's thread; state is under a lock."""
+
+    def __init__(self, model_path=MODEL_PATH):
+        self.model_path = model_path
+        self._mx = threading.Lock()
+        self._pending = {}          # ts_ms -> (crop px, (W, H), epoch)
+        self._epoch = 0             # bumps on reset: in-flight results ignored
+        self._reset_req = False
+        self._cb_err = False
+        self.generation = 0
+        self.n_reject = 0           # diagnostics: jump-rejected results, total
+        self._to_search()
+        self._new_landmarker()
+
+    # -- MediaPipe ---------------------------------------------------------
+    def _new_landmarker(self):
+        options = vision.PoseLandmarkerOptions(
+            base_options=mp_tasks.BaseOptions(model_asset_path=self.model_path),
+            running_mode=vision.RunningMode.LIVE_STREAM,
+            result_callback=self._on_result,
+            num_poses=1,
+            min_pose_detection_confidence=0.5,
+            min_tracking_confidence=0.5,
+        )
+        self.landmarker = vision.PoseLandmarker.create_from_options(options)
+        self._t0 = time.time()
+        self._last_ts = -1
+
+    def close(self):
+        try:
+            self.landmarker.close()
+        except Exception:
+            pass
+
+    # -- state -------------------------------------------------------------
+    def _to_search(self):
+        """Caller holds the lock (or is __init__)."""
+        self.mode = "search"
+        self.crop = None            # (x0, y0, w, h) px; None = full frame
+        self.ref = None             # (centre px, scale px) of last accepted
+        self.rejecting = False
+        self.last_ok = time.time()
+        self._latest = None
+
+    def reset(self):
+        """Forget the performer and search the full frame again (the r key)."""
+        self._reset_req = True
+
+    def latest(self):
+        return self._latest
+
+    # -- per frame ---------------------------------------------------------
+    def submit(self, frame):
+        """Hand one BGR frame to MediaPipe (cropped when tracking). Returns
+        False if the landmarker failed and was rebuilt."""
+        H, W = frame.shape[:2]
+        with self._mx:
+            if self._reset_req:
+                self._reset_req = False
+                self._epoch += 1
+                self._to_search()
+            elif self.mode == "track" and time.time() - self.last_ok > LOST_S:
+                self._to_search()
+            x0, y0, cw, ch = self.crop if self.mode == "track" else (0, 0, W, H)
+            ts = max(int((time.time() - self._t0) * 1000), self._last_ts + 1)
+            self._last_ts = ts
+            self._pending[ts] = ((x0, y0, cw, ch), (W, H), self._epoch)
+            while len(self._pending) > 64:      # results MediaPipe dropped
+                del self._pending[min(self._pending)]
+        try:
+            rgb = cv2.cvtColor(frame[y0:y0 + ch, x0:x0 + cw], cv2.COLOR_BGR2RGB)
+            img = mp.Image(image_format=mp.ImageFormat.SRGB,
+                           data=np.ascontiguousarray(rgb))
+            self.landmarker.detect_async(img, ts)
+            return True
+        except Exception as e:
+            print(f"tracker error ({e}); rebuilding...")
+            self.close()
+            with self._mx:
+                self._pending.clear()
+                self._new_landmarker()
+            return False
+
+    def _on_result(self, result, output_image, timestamp_ms):
+        try:
+            with self._mx:
+                meta = self._pending.pop(timestamp_ms, None)
+                for k in [k for k in self._pending if k < timestamp_ms]:
+                    del self._pending[k]        # older frames were dropped
+                if meta is None or meta[2] != self._epoch:
+                    return
+                if result.pose_landmarks and result.pose_world_landmarks:
+                    self._accept(result.pose_landmarks[0],
+                                 result.pose_world_landmarks[0], meta)
+        except Exception as e:
+            if not self._cb_err:                # once: it runs every frame
+                self._cb_err = True
+                print(f"PersonTracker result error: {e!r}")
+
+    def _accept(self, lm, wl, meta):
+        (x0, y0, cw, ch), (W, H), _ = meta
+        cimg = np.array([[p.x, p.y] for p in lm])           # crop-normalised
+        vis = np.array([p.visibility for p in lm])
+        if min(vis[L_SHOULDER], vis[R_SHOULDER]) < VIS_OFF:
+            return                  # no torso to tell who this is
+        inview = np.all((cimg >= 0.0) & (cimg <= 1.0), axis=1)
+        px = cimg * np.array([cw, ch]) + np.array([x0, y0])  # full-frame px
+        sig = pose_signature(px, hips_in=bool(inview[L_HIP] and inview[R_HIP]),
+                             min_scale=4.0)
+        if self.mode == "search":
+            self.generation += 1
+            self.mode = "track"
+            self.crop = self._fit(px, vis, sig, W, H)
+        else:
+            (c0, s0), (c1, s1) = self.ref, sig
+            if (np.linalg.norm(c1 - c0) > JUMP_GATE * s0
+                    or not JUMP_SCALE[0] <= s1 / s0 <= JUMP_SCALE[1]):
+                self.n_reject += 1
+                self.rejecting = True
+                return
+            self.rejecting = False
+            moved = self._refit(px, vis, sig, W, H)
+            if moved is not None:
+                self.crop = moved
+        self.ref = sig
+        self.last_ok = time.time()
+        self._latest = {"img": px / np.array([W, H]),
+                        "world": np.array([[p.x, p.y, p.z] for p in wl]),
+                        "vis": vis, "inview": inview, "stamp": self.last_ok}
+
+    # -- crop geometry (pixels) ----------------------------------------------
+    @staticmethod
+    def _fit(px, vis, sig, W, H):
+        """Crop centred on the torso: at least CROP_W x CROP_H torso scales,
+        and wide enough to hold every visible landmark plus CROP_MARGIN."""
+        (cx, cy), s = sig
+        hw, hh = 0.5 * CROP_W * s, 0.5 * CROP_H * s
+        k = [i for i in TRACK_PTS if vis[i] > VIS_OFF]
+        if k:
+            lo = px[k].min(axis=0) - CROP_MARGIN * s
+            hi = px[k].max(axis=0) + CROP_MARGIN * s
+            hw = max(hw, cx - lo[0], hi[0] - cx)
+            hh = max(hh, cy - lo[1], hi[1] - cy)
+        cw = int(min(max(2 * hw, CROP_MIN_PX), W))
+        ch = int(min(max(2 * hh, CROP_MIN_PX), H))
+        x0 = int(np.clip(cx - cw / 2, 0, W - cw))
+        y0 = int(np.clip(cy - ch / 2, 0, H - ch))
+        return x0, y0, cw, ch
+
+    def _refit(self, px, vis, sig, W, H):
+        """A new crop if the performer nears an edge of the current one (an
+        edge that isn't the frame border) or needs a much bigger/smaller one;
+        otherwise None, and the crop stays put."""
+        x0, y0, cw, ch = self.crop
+        want = self._fit(px, vis, sig, W, H)
+        if want[2] > CROP_GROW * cw or want[3] > CROP_GROW * ch:
+            return want
+        if want[2] < CROP_SHRINK * cw and want[3] < CROP_SHRINK * ch:
+            return want
+        k = [i for i in TRACK_PTS if vis[i] > VIS_OFF]
+        if not k:
+            return None
+        cn = (px[k] - np.array([x0, y0])) / np.array([cw, ch])
+        near = ((x0 > 0 and cn[:, 0].min() < CROP_EDGE)
+                or (y0 > 0 and cn[:, 1].min() < CROP_EDGE)
+                or (x0 + cw < W and cn[:, 0].max() > 1.0 - CROP_EDGE)
+                or (y0 + ch < H and cn[:, 1].max() > 1.0 - CROP_EDGE))
+        return want if near else None
+
+    # -- overlay -----------------------------------------------------------
+    def status(self):
+        if self.mode == "search":
+            return "SEARCHING full frame (performer alone in view)"
+        lost = time.time() - self.last_ok
+        if self.rejecting:
+            return f"HOLDING - other person rejected ({lost:.1f} s)"
+        return "TRACKING" if lost < 0.2 else f"TRACKING (lost {lost:.1f} s)"
+
+    def draw(self, frame, org=(20, 136)):
+        """Crop box + status line on the full frame."""
+        crop = self.crop
+        col = (0, 0, 255) if self.rejecting else (255, 255, 0)
+        if self.mode == "track" and crop is not None:
+            x0, y0, cw, ch = crop
+            cv2.rectangle(frame, (x0, y0), (x0 + cw, y0 + ch), col, 2)
+        cv2.putText(frame, self.status() + "   (r = reset)", org,
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6,
+                    (0, 165, 255) if self.mode == "search" else col, 2)
 
 
 DEPTH_FIX = "--nodepthfix" not in sys.argv   # on by default; --nodepthfix reverts
@@ -562,7 +795,8 @@ def main():
         src_fps = 30.0
     log = [] if LOGPATH else None
 
-    landmarker = make_landmarker()
+    tracker = PersonTracker()
+    seen_gen = tracker.generation
     gates = Gates()
     filters = {n: OneEuro() for n in JOINT_NAMES}
     last_sent = {}
@@ -597,27 +831,26 @@ def main():
                         time.sleep(slack)
                 h, w = frame.shape[:2]
 
-                try:
-                    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
-                    landmarker.detect_async(mp_image, int((time.time() - t0) * 1000))
-                except Exception as e:
-                    print(f"tracker error ({e}); rebuilding...")
-                    try:
-                        landmarker.close()
-                    except Exception:
-                        pass
-                    landmarker = make_landmarker()
-                    t0 = time.time()
+                if not tracker.submit(frame):
                     continue
 
                 now = time.time()
-                fresh = latest["world"] is not None and now - latest["stamp"] < 0.5
+                if tracker.generation != seen_gen:
+                    # a NEW performer was acquired: bone lengths, depth signs
+                    # and swap history all belonged to the previous one
+                    seen_gen = tracker.generation
+                    arm_guard = SwapGuard(L_WRIST, R_WRIST, ARM_CHAIN_L, ARM_CHAIN_R)
+                    leg_guard = SwapGuard(L_ANKLE, R_ANKLE, LEG_CHAIN_L, LEG_CHAIN_R)
+                    bones = BoneCalibrator()
+                    bonedepth = BoneDepth()
+                lat = tracker.latest()
+                fresh = lat is not None and now - lat["stamp"] < 0.5
+                tracker.draw(frame)
 
                 sent = {}
                 if fresh:
-                    world = latest["world"].copy()
-                    vis = latest["vis"]
+                    world = lat["world"].copy()
+                    vis = lat["vis"]
 
                     if DEPTH_FIX:
                         # z from bone length, before anything else consumes it
@@ -645,10 +878,11 @@ def main():
                         # frame flapped between the hip and gravity paths,
                         # stepping every arm angle ~9 deg on each toggle.
                         # A landmark outside the frame is not an observation.
-                        img = latest["img"]
-                        inframe = all(0.0 <= img[k][1] <= 1.0 and
-                                      0.0 <= img[k][0] <= 1.0
-                                      for k in (L_HIP, R_HIP))
+                        # With the crop, "the frame" is the crop MediaPipe saw:
+                        # a hip inside the camera image but outside the crop
+                        # is just as fabricated.
+                        inframe = bool(lat["inview"][L_HIP] and
+                                       lat["inview"][R_HIP])
                         hips_ok = bool(min(vis[L_HIP], vis[R_HIP]) >= VIS_OFF
                                        and inframe)
                         pkt = {"world": [[round(float(c), 4) for c in p3]
@@ -660,7 +894,7 @@ def main():
                         sock.sendto(json.dumps(sent).encode(), UDP_ADDR)
 
                     # overlay (2D landmarks): green tracked, gray gated
-                    px = (latest["img"] * np.array([w, h])).astype(int)
+                    px = (lat["img"] * np.array([w, h])).astype(int)
                     for a, b in POSE_CONNECTIONS:
                         seen = min(vis[a], vis[b]) > VIS_OFF
                         color = (0, 255, 0) if seen else (120, 120, 120)
@@ -694,12 +928,19 @@ def main():
                                 (0, 0, 255), 2)
 
                 if log is not None:
+                    crop = tracker.crop if tracker.mode == "track" else None
                     log.append({
                         "i": src_i, "t": now - t0,
                         "fresh": bool(fresh),
-                        "stamp": (latest["stamp"] - t0) if fresh else float("nan"),
-                        "px": latest["img"].copy() if fresh else np.full((33, 2), np.nan),
-                        "vis": latest["vis"].copy() if fresh else np.full(33, np.nan),
+                        "stamp": (lat["stamp"] - t0) if fresh else float("nan"),
+                        "px": lat["img"].copy() if fresh else np.full((33, 2), np.nan),
+                        "vis": lat["vis"].copy() if fresh else np.full(33, np.nan),
+                        # crop MediaPipe is working on, normalised x0,y0,w,h
+                        "crop": (np.array(crop, float) / [w, h, w, h]
+                                 if crop is not None else np.array([0.0, 0.0, 1.0, 1.0])),
+                        "tracking": int(tracker.mode == "track"),
+                        "rejecting": int(tracker.rejecting),
+                        "gen": int(tracker.generation),
                         "world_raw": np.full((33, 3), np.nan),
                         "world": world.copy() if fresh else np.full((33, 3), np.nan),
                         "hips_ok": (bool(min(vis[L_HIP], vis[R_HIP]) >= VIS_OFF)
@@ -710,7 +951,7 @@ def main():
                         "nsent": len(sent),
                     })
                     if fresh:
-                        log[-1]["world_raw"] = latest["world"].copy()
+                        log[-1]["world_raw"] = lat["world"].copy()
 
                 n += 1
                 if n % 10 == 0:
@@ -721,8 +962,11 @@ def main():
 
                 if not NOSHOW:
                     cv2.imshow("live pose 3D (q to quit)", frame)
-                    if cv2.waitKey(1) & 0xFF == ord("q"):
+                    key = cv2.waitKey(1) & 0xFF
+                    if key == ord("q"):
                         break
+                    if key == ord("r"):
+                        tracker.reset()      # performer must be alone in view
 
             except Exception as e:
                 print(f"recovered from error: {e}")
@@ -730,13 +974,16 @@ def main():
     except KeyboardInterrupt:
         pass
 
+    tracker.close()
     cap.release()
     cv2.destroyAllWindows()
+    print(f"tracker: {tracker.generation} acquisition(s), "
+          f"{tracker.n_reject} jump-rejected result(s)")
     if log:
         keys = ("i", "t", "stamp", "fresh", "hips_ok", "bones_ready",
-                "swap_arm", "swap_leg", "nsent")
+                "swap_arm", "swap_leg", "nsent", "tracking", "rejecting", "gen")
         blob = {k: np.array([r[k] for r in log]) for k in keys}
-        for k in ("px", "vis", "world", "world_raw"):
+        for k in ("px", "vis", "world", "world_raw", "crop"):
             blob[k] = np.array([r[k] for r in log])
         os.makedirs(os.path.dirname(os.path.abspath(LOGPATH)), exist_ok=True)
         np.savez_compressed(LOGPATH, **blob)
