@@ -1,10 +1,12 @@
 """
 live_pipeline_check.py - test the WHOLE live pipeline without a camera.
 
-    python sim36/live_pipeline_check.py            # all three checks (~45 s)
+    python sim36/live_pipeline_check.py            # all checks (~65 s)
     python sim36/live_pipeline_check.py fusion     # just one of them
+    python sim36/live_pipeline_check.py fusion3
     python sim36/live_pipeline_check.py single
     python sim36/live_pipeline_check.py stereo
+    python sim36/live_pipeline_check.py triple
 
 A synthetic person (live mimic system/synthetic_person.py) stands in for
 you. Everything else is the REAL code:
@@ -15,6 +17,9 @@ you. Everything else is the REAL code:
           -> UDP -> the real mimic_receiver_v11.py (headless) -> did the
           robot's joints follow the person, how far behind, how accurately.
   stereo  the same, through pose_sender_stereo.py with two fake cameras.
+  fusion3 three cameras (front, +60, -60 deg): one vs two vs three, and the
+          case three cameras exist for - an arm hidden from one view.
+  triple  the full pipeline with three fake cameras.
 
 Only the camera and the MediaPipe network are faked, so a PASS here means a
 failure on your Mac is in the camera / MediaPipe / viewer, and the STATUS
@@ -101,6 +106,46 @@ def check_fusion():
     return ok
 
 
+def check_fusion3():
+    print("\n== fusion: one vs two vs three cameras (front, +60, -60 deg)")
+    nA, nB, nC = Noise(1), Noise(2), Noise(3)
+    RB, RC = Ry(CAM_YAW), Ry(-CAM_YAW)
+    aB, aC = sf.ViewAligner(), sf.ViewAligner()
+    e1, e2, e3, h2, h3 = [], [], [], [], []
+    for t in np.arange(0, 24, 1 / 20):
+        W, vis = sp.pose(t)
+        A, B, C = nA(W), nB((RB @ W.T).T), nC((RC @ W.T).T)
+        aB.update(A, vis, B, vis)
+        aC.update(A, vis, C, vis)
+        if t < 6 or not (aB.ready and aC.ready):
+            continue
+        I = np.eye(3)
+        F2, _ = sf.fuse_many([(A, vis, I, None), (B, vis, aB.R, aB.t)])
+        F3, _ = sf.fuse_many([(A, vis, I, None), (B, vis, aB.R, aB.t),
+                              (C, vis, aC.R, aC.t)])
+        e1 += limb_err(A, W)
+        e2 += limb_err(F2, W)
+        e3 += limb_err(F3, W)
+        # occlusion: camera B loses the left arm (as when it crosses the body)
+        vB = vis.copy()
+        vB[[11, 13, 15]] = 0.05
+        G2, _ = sf.fuse_many([(A, vis, I, None), (B, vB, aB.R, aB.t)])
+        G3, _ = sf.fuse_many([(A, vis, I, None), (B, vB, aB.R, aB.t),
+                              (C, vis, aC.R, aC.t)])
+        h2 += limb_err(G2, W)[:2]
+        h3 += limb_err(G3, W)[:2]
+    print(f"   aligner: B {aB.angle_deg():.1f} deg, C {aC.angle_deg():.1f} deg "
+          f"(true {CAM_YAW:.0f} each)")
+    print(f"   limb direction error: one {np.mean(e1):.1f}  ->  two "
+          f"{np.mean(e2):.1f}  ->  three {np.mean(e3):.1f} deg")
+    print(f"   left arm hidden from B: two cameras {np.mean(h2):.1f}  ->  three "
+          f"{np.mean(h3):.1f} deg")
+    ok = (abs(aB.angle_deg() - CAM_YAW) < 3 and abs(aC.angle_deg() - CAM_YAW) < 3
+          and np.mean(e3) <= np.mean(e2) and np.mean(h3) < 0.8 * np.mean(h2))
+    print("   PASS" if ok else "   FAIL")
+    return ok
+
+
 # --------------------------------------------------------------------------
 # fakes for the camera and MediaPipe
 class _P:
@@ -154,6 +199,8 @@ class FakeLandmarker:
         W, vis = sp.pose(t)
         if idx == 1:
             W = (Ry(CAM_YAW) @ W.T).T
+        elif idx == 2:
+            W = (Ry(-CAM_YAW) @ W.T).T
         W = FakeLandmarker.noise.setdefault(idx, Noise(10 + idx))(W)
         img = [_P(0.5 + 0.8 * p[0], 0.55 + 0.8 * p[1]) for p in W]
         wld = [_P(*p) for p in W]
@@ -266,9 +313,17 @@ def check_stereo():
                          ["pose_sender_stereo.py", "--cams", "0", "1", "--noshow"])
 
 
+def check_triple():
+    print("\n== three cameras: fake cameras + fake MediaPipe -> REAL "
+          "pose_sender_stereo -> UDP -> REAL receiver")
+    return _run_pipeline("triple", "pose_sender_stereo",
+                         ["pose_sender_stereo.py", "--cams", "0", "1", "2", "--noshow"])
+
+
 if __name__ == "__main__":
-    which = sys.argv[1:] or ["fusion", "single", "stereo"]
-    fns = {"fusion": check_fusion, "single": check_single, "stereo": check_stereo}
+    which = sys.argv[1:] or ["fusion", "fusion3", "single", "stereo", "triple"]
+    fns = {"fusion": check_fusion, "fusion3": check_fusion3, "single": check_single,
+           "stereo": check_stereo, "triple": check_triple}
     results = {w: fns[w]() for w in which}
     print("\nRESULT:", "PASS" if all(results.values()) else
           "FAIL " + str([k for k, v in results.items() if not v]))

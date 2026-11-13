@@ -1,6 +1,6 @@
 """
-stereo_fusion.py - combine two cameras' MediaPipe WORLD landmarks into one
-skeleton with real depth. Pure numpy, no camera needed, so it is unit-tested
+stereo_fusion.py - combine two (or more) cameras' MediaPipe WORLD landmarks
+into one skeleton with real depth. Pure numpy, no camera needed, so it is unit-tested
 by sim36/live_pipeline_check.py.
 
 WHY TWO CAMERAS HELP
@@ -97,19 +97,39 @@ def _cov(vis):
     return C
 
 
-def fuse(A, visA, B, visB, R, t=None):
-    """Fused (33,3) landmarks in camera A's frame, and fused visibility."""
-    Bin = (R @ B.T).T + (0.0 if t is None else t)   # B's points in A's frame
-    CA = _cov(visA)
-    CB = R[None] @ _cov(visB) @ R.T[None]  # rotate B's ellipsoids too
-    out = A.copy()
-    vis = np.maximum(visA, visB)
-    for i in range(len(A)):
-        okA, okB = visA[i] >= VIS_MIN, visB[i] >= VIS_MIN
-        if okA and okB:
-            IA, IB = np.linalg.inv(CA[i]), np.linalg.inv(CB[i])
-            out[i] = np.linalg.solve(IA + IB, IA @ A[i] + IB @ Bin[i])
-        elif okB:
-            out[i] = Bin[i]
-        # okA only, or neither: keep A's own estimate
+def fuse_many(views):
+    """Fuse any number of cameras. views: list of (P, vis, R, t) where P is
+    that camera's (33,3) world landmarks and R, t map them into the reference
+    frame (R = I, t = 0 for the reference camera itself). Each landmark is the
+    inverse-covariance blend of every camera that sees it (vis >= VIS_MIN);
+    if none does, the first view's estimate is kept.
+    Returns fused (33,3) in the reference frame and the max visibility."""
+    P0, vis0, R0, t0 = views[0]
+    n = len(P0)
+    info = np.zeros((n, 3, 3))
+    acc = np.zeros((n, 3))
+    first = None
+    for P, vis, R, t in views:
+        Pin = (R @ np.asarray(P).T).T + (0.0 if t is None else t)
+        if first is None:
+            first = Pin
+        s = BASE_SIGMA / np.clip(vis, 0.05, 1.0)
+        Dinv = np.zeros((n, 3, 3))                 # inverse covariance, camera frame
+        Dinv[:, 0, 0] = Dinv[:, 1, 1] = 1.0 / s ** 2
+        Dinv[:, 2, 2] = 1.0 / (DEPTH_RATIO * s) ** 2
+        Iw = R[None] @ Dinv @ R.T[None]            # rotated into the reference frame
+        ok = (np.asarray(vis) >= VIS_MIN)[:, None, None]
+        info += np.where(ok, Iw, 0.0)
+        acc += np.where(ok[:, :, 0], np.einsum("nij,nj->ni", Iw, Pin), 0.0)
+    out = first.copy()
+    seen = np.array([np.any(info[i]) for i in range(n)])
+    if seen.any():
+        out[seen] = np.linalg.solve(info[seen], acc[seen][..., None])[..., 0]
+    vis = np.max(np.stack([v[1] for v in views]), axis=0)
     return out, vis
+
+
+def fuse(A, visA, B, visB, R, t=None):
+    """Two-camera form, kept for existing callers: fused (33,3) landmarks in
+    camera A's frame, and fused visibility."""
+    return fuse_many([(A, visA, np.eye(3), None), (B, visB, R, t)])

@@ -1,28 +1,37 @@
 """
-pose_sender_stereo.py - TWO cameras (e.g. the Mac's own + an iPhone via
-Continuity Camera) -> one skeleton with real depth -> the v11 robot.
+pose_sender_stereo.py - TWO OR THREE cameras (e.g. the Mac's own + an iPhone via
+Continuity Camera + an iPad via Camo) -> one skeleton with real depth -> the
+v11 robot.
 
     python "live mimic system/pose_sender_stereo.py" --list-cams   # find indices
     python "live mimic system/pose_sender_stereo.py" --cams 0 1
+    python "live mimic system/pose_sender_stereo.py" --cams 0 1 2   # 3 cameras
     mjpython "live mimic system/mimic_receiver_v11.py"            # other terminal
 
 Same UDP packet as `pose_sender.py --landmarks`, so the receiver needs no
 change and you can switch between one and two cameras freely.
 
 SETTING UP
-  * Put the two cameras 45-90 deg apart around you, both seeing your upper
-    body (hips too, if you can). E.g. Mac in front, iPhone off to one side.
+  * Put the cameras 45-90 deg apart around you, all seeing your upper body
+    (hips too, if you can). E.g. Mac in front, iPhone off to one side, and a
+    third camera off to the OTHER side.
   * Start it and MOVE YOUR ARMS AROUND for ~5 s. It learns how the cameras
     are angled from your own body (no checkerboard); the window says
     "aligning" until then, then shows the angle it found between them.
     If that angle looks wrong (it should roughly match how you placed them),
     press r to re-learn.
-  * Camera A (first index) is the reference. If a camera drops out, the other
-    one carries on alone, so the robot never just stops.
+  * Camera A (first index) is the reference: every other camera learns its
+    angle relative to A, so A should see you well. Once learned, any camera
+    that drops out (A included) is simply left out of the fusion and the
+    rest carry on, so the robot never just stops.
+  * A third camera mostly helps when an arm is hidden from one view (crossing
+    your body, turned away); depth is already good with two.
+  * Each camera runs its own MediaPipe, so three cost ~50% more CPU than two.
+    If fps drops: --res 640x480, --model lite, or --gpu.
 
-FLAGS  --cams A B  --model lite|full|heavy  --gpu  --res 1280x720  --noshow
+FLAGS  --cams A B [C]  --model lite|full|heavy  --gpu  --res 1280x720  --noshow
        --list-cams
-       A / B can be a camera number OR a stream URL from an IP-camera app on
+       each camera can be a camera number OR a stream URL from an IP-camera app on
        the phone (e.g. --cams 0 http://192.168.1.23:8081/video): that goes
        over Wi-Fi with no Continuity Camera distance limit.
 How it fuses: see stereo_fusion.py.
@@ -41,7 +50,7 @@ import cv2  # noqa: E402
 import numpy as np  # noqa: E402
 
 import pose_sender as ps  # noqa: E402
-from stereo_fusion import ViewAligner, fuse  # noqa: E402
+from stereo_fusion import ViewAligner, fuse_many  # noqa: E402
 
 FRESH_S = 0.3          # a view older than this is treated as lost
 PAIR_S = 0.15          # results this close in time are treated as simultaneous
@@ -74,7 +83,8 @@ def list_cams(n=6):
             print(f"  camera {i}: opens but sent no frame in 6 s "
                   "(asleep, locked iPhone, or no camera permission)")
         cap.release()
-    print(f"{found} camera(s). Use them as: --cams <Mac index> <iPhone index>")
+    print(f"{found} camera(s). Use them as: --cams <Mac index> <iPhone index> "
+          "[<third index>]")
 
 
 class View:
@@ -175,71 +185,116 @@ class View:
             pass
 
 
+NAMES = "ABCDEF"
+
+
+def parse_cams(argv):
+    """--cams 0 1 [2 ...]: numbers are local cameras (Mac webcam, Continuity
+    Camera iPhone, Camo iPad); anything else is a stream URL from an IP-camera
+    app (http://192.168.1.23:8081/video), which goes over Wi-Fi."""
+    if "--cams" not in argv:
+        return [0, 1]
+    i = argv.index("--cams") + 1
+    out = []
+    while i < len(argv) and not argv[i].startswith("--"):
+        out.append(int(argv[i]) if argv[i].isdigit() else argv[i])
+        i += 1
+    if not 2 <= len(out) <= len(NAMES):
+        sys.exit(f"--cams needs 2 to {len(NAMES)} cameras, got {len(out)}")
+    return out
+
+
 def main():
     if "--list-cams" in sys.argv:
         list_cams()
         return
-    a_idx, b_idx = 0, 1
-    if "--cams" in sys.argv:
-        i = sys.argv.index("--cams")
-        # a number = a local camera (Mac webcam, Continuity Camera iPhone);
-        # anything else = a stream URL, e.g. an iPhone IP-camera app
-        # (http://192.168.1.23:8081/video) - that goes over Wi-Fi, so it has
-        # no Continuity Camera distance limit.
-        a_idx, b_idx = ([int(v) if v.isdigit() else v
-                         for v in (sys.argv[i + 1], sys.argv[i + 2])])
+    srcs = parse_cams(sys.argv)
     noshow = "--noshow" in sys.argv
 
     ps.ensure_model()
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    views = [View(a_idx, "A"), View(b_idx, "B")]
-    A, B = views
-    align = ViewAligner()
+    views = [View(src, NAMES[k]) for k, src in enumerate(srcs)]
+    A, others = views[0], views[1:]
+    # one aligner per non-reference camera: maps that camera into A's frame
+    align = {v.name: ViewAligner() for v in others}
     m_sent = ps.RateMeter()
     mode = "starting"
     nxt = time.time() + 2.0
     next_draw = 0.0
     cpu0, loops = time.process_time(), 0
-    seen = (0, 0)
+    seen = tuple(0 for _ in views)
     src_i = 0
-    print(f"Stereo mocap -> udp://{ps.UDP_ADDR[0]}:{ps.UDP_ADDR[1]} (landmarks)")
-    print(f"camera A = {a_idx} (reference), camera B = {b_idx}. "
-          "Move your arms for ~5 s so the views can align. q quits, r re-aligns.\n")
+    tile_h = 400 if len(views) == 2 else 300
+
+    def aligned(v):
+        return v is A or align[v.name].ready
+
+    def to_ref(v):
+        if v is A:
+            return np.eye(3), None
+        return align[v.name].R, align[v.name].t
+
+    def align_text():
+        parts = []
+        for v in others:
+            a = align[v.name]
+            parts.append(f"{v.name} {a.angle_deg():.0f} deg" if a.ready else
+                         f"{v.name} aligning {min(a.n, a.min_frames)}/{a.min_frames}")
+        return "vs A: " + ", ".join(parts)
+
+    print(f"Multi-camera mocap -> udp://{ps.UDP_ADDR[0]}:{ps.UDP_ADDR[1]} (landmarks)")
+    print("cameras: " + ", ".join(f"{v.name} = {v.idx}" for v in views)
+          + "  (A is the reference). Move your arms for ~5 s so the views can "
+          "align. q quits, r re-aligns.\n")
     try:
         while True:
             now = time.time()
-            newA, newB = A.poll(now), B.poll(now)
-            okA, okB = A.fresh(now), B.fresh(now)
+            new = {v.name: v.poll(now) for v in views}
+            ok = {v.name: v.fresh(now) for v in views}
 
-            if (newA or newB) and okA and okB and abs(A.stamp - B.stamp) < PAIR_S:
-                align.update(A.world, A.vis, B.world, B.vis)
+            # learn each camera's angle relative to A from simultaneous views
+            for v in others:
+                if ((new["A"] or new[v.name]) and ok["A"] and ok[v.name]
+                        and abs(A.stamp - v.stamp) < PAIR_S):
+                    align[v.name].update(A.world, A.vis, v.world, v.vis)
 
-            if newA or newB:
+            if any(new.values()):
                 F = None
-                if okA and okB and align.ready and abs(A.stamp - B.stamp) < PAIR_S:
-                    F, _ = fuse(A.world, A.vis, B.world, B.vis, align.R, align.t)
-                    mode = "FUSED (2 cameras)"
-                elif okA:
-                    F = A.world
-                    mode = "camera A only" + ("" if align.ready else " (aligning)")
-                elif okB:
-                    # IK works in YOUR body frame, so B alone is fine even
-                    # before the views are aligned
-                    F = ((align.R @ B.world.T).T + align.t) if align.ready else B.world
-                    mode = "camera B only"
+                live = [v for v in views if ok[v.name] and aligned(v)]
+                if live:
+                    # fuse the newest result with every camera that saw the
+                    # same moment (within PAIR_S); all in A's frame
+                    t_new = max(v.stamp for v in live)
+                    group = [v for v in live if t_new - v.stamp < PAIR_S]
+                    F, _ = fuse_many([(v.world, v.vis) + to_ref(v) for v in group])
+                    names = "+".join(v.name for v in group)
+                    if len(group) >= 2:
+                        mode = f"FUSED ({len(group)} cameras: {names})"
+                    else:
+                        mode = f"camera {names} only"
+                    waiting = [v.name for v in others if not align[v.name].ready]
+                    if waiting:
+                        mode += f" ({'/'.join(waiting)} aligning)"
+                else:
+                    # nobody aligned is fresh: IK works in YOUR body frame, so
+                    # any single camera is fine on its own before alignment
+                    for v in views:
+                        if ok[v.name]:
+                            F = v.world
+                            mode = f"camera {v.name} only (aligning)"
+                            break
                 if F is not None and np.all(np.isfinite(F)):
-                    hips_ok = ((okA and ps.hips_in_frame(A.img, A.vis)) or
-                               (okB and ps.hips_in_frame(B.img, B.vis)))
+                    hips_ok = any(ok[v.name] and ps.hips_in_frame(v.img, v.vis)
+                                  for v in views)
                     src_i += 1
                     sock.sendto(ps.landmark_packet(F, hips_ok, src_i), ps.UDP_ADDR)
                     m_sent.tick()
-            elif not (okA or okB):
-                mode = "no person in either camera"
-            for v in views:
-                if v.cam.status() != "live":
-                    mode = (f"ONLY ONE CAMERA - camera {v.name} has no video"
-                            if any(w.cam.status() == "live" for w in views)
-                            else "NO VIDEO from either camera")
+            elif not any(ok.values()):
+                mode = "no person in any camera"
+            dead = [v.name for v in views if v.cam.status() != "live"]
+            if dead:
+                mode = (f"camera {'/'.join(dead)} has NO VIDEO - running on the rest"
+                        if len(dead) < len(views) else "NO VIDEO from any camera")
 
             rs = m_sent.update(now)
             if now >= nxt:
@@ -247,57 +302,55 @@ def main():
                 cpu = 100.0 * (time.process_time() - cpu0) / 2.0
                 cpu0 = time.process_time()
                 print(f"STATUS {mode} | sender CPU {cpu:3.0f}% | "
-                      f"A {A.m_cam.rate:4.1f} fps pose "
-                      f"{A.m_pose.rate:4.1f}/s | B {B.m_cam.rate:4.1f} fps pose "
-                      f"{B.m_pose.rate:4.1f}/s | sent {rs:4.1f}/s | views "
-                      + (f"{align.angle_deg():.0f} deg apart" if align.ready
-                         else f"aligning {min(align.n, align.min_frames)}/"
-                              f"{align.min_frames}"), flush=True)
+                      + " | ".join(f"{v.name} {v.m_cam.rate:4.1f} fps pose "
+                                   f"{v.m_pose.rate:4.1f}/s" for v in views)
+                      + f" | sent {rs:4.1f}/s | {align_text()}", flush=True)
                 for v in views:
                     st = v.cam.status()
                     if st != "live":
                         print(f"   -> camera {v.name} (index {v.idx}): {st}. "
-                              "Running on the OTHER camera only until it is back. "
+                              "Running on the other cameras until it is back. "
                               "If it never starts, the index is probably wrong: "
                               "--list-cams", flush=True)
                     elif v.m_cam.rate and v.m_cam.rate < 15:
                         print(f"   -> camera {v.name} is slow ({v.m_cam.rate:.0f} "
                               "fps): more light, or --res 640x480", flush=True)
-                if align.ready and align.angle_deg() < 15:
-                    print("   -> the cameras look almost the same direction - "
-                          "move one 45-90 deg around you for real depth",
-                          flush=True)
+                for v in others:
+                    a = align[v.name]
+                    if a.ready and a.angle_deg() < 15:
+                        print(f"   -> cameras A and {v.name} look almost the same "
+                              "direction - move one 45-90 deg around you",
+                              flush=True)
 
             loops += 1
-            frames = (A.last_fseq, B.last_fseq)
+            frames = tuple(v.last_fseq for v in views)
             new_frame = frames != seen
             seen = frames
             # Redraw only when a camera actually delivered something new, and
-            # at most 30x/s. The old loop rebuilt and redrew both tiles as fast
+            # at most 30x/s. The old loop rebuilt and redrew the tiles as fast
             # as it could spin - hundreds of times a second of pure CPU, which
             # was fine alone but starved the cameras once the sim also ran.
             # (and twice a second regardless, so a dead camera's NO VIDEO
             # banner still updates)
             if not noshow and now >= next_draw and (new_frame or now >= next_draw + 0.5):
                 next_draw = now + 1.0 / 30.0
-                tiles = [v.tile(now) for v in views]
+                tiles = [v.tile(now, tile_h) for v in views]
                 h = min(t.shape[0] for t in tiles)
                 view = np.hstack([t[:h] for t in tiles])
+                ready = all(a.ready for a in align.values())
                 cv2.putText(view, f"{mode} | sent {rs:4.1f}/s | " +
-                            (f"cameras {align.angle_deg():.0f} deg apart"
-                             if align.ready else
-                             f"ALIGNING {min(align.n, align.min_frames)}/"
-                             f"{align.min_frames} - move your arms around"),
+                            (align_text() if ready else
+                             align_text() + " - move your arms around"),
                             (10, h - 14), cv2.FONT_HERSHEY_SIMPLEX, 0.6,
                             (0, 255, 0) if "FUSED" in mode else (0, 200, 255), 2)
-                cv2.imshow("stereo pose (q quit, r re-align)", view)
+                cv2.imshow("multi-camera pose (q quit, r re-align)", view)
                 k = cv2.waitKey(1) & 0xFF
                 if k == ord("q"):
                     break
                 if k == ord("r"):
-                    align = ViewAligner()
+                    align = {v.name: ViewAligner() for v in others}
                     print("re-aligning: move your arms around")
-            if not (newA or newB or new_frame):
+            if not (any(new.values()) or new_frame):
                 time.sleep(0.003)            # nothing new: don't spin a core
     except KeyboardInterrupt:
         pass
