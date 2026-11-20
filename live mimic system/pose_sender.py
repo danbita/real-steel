@@ -171,14 +171,32 @@ class MJPEGCapture:
     buffering of its own."""
 
     def __init__(self, url, timeout=5.0):
+        import urllib.parse
         import urllib.request
-        self.url = url
         self.buf = b""
         self.wh = (0, 0)
+        # A login can ride in the URL: http://user:pass@dans-ipad.local:8081/video
+        # (IP Camera Lite has one on by default). Basic and Digest both handled.
+        u = urllib.parse.urlsplit(url)
+        handlers = []
+        if u.username is not None:
+            host = u.hostname + (f":{u.port}" if u.port else "")
+            url = urllib.parse.urlunsplit((u.scheme, host, u.path, u.query, u.fragment))
+            pw = urllib.request.HTTPPasswordMgrWithDefaultRealm()
+            pw.add_password(None, url, urllib.parse.unquote(u.username),
+                            urllib.parse.unquote(u.password or ""))
+            handlers = [urllib.request.HTTPBasicAuthHandler(pw),
+                        urllib.request.HTTPDigestAuthHandler(pw)]
+        self.url = url
         try:
-            self.resp = urllib.request.urlopen(url, timeout=timeout)
+            self.resp = urllib.request.build_opener(*handlers).open(url, timeout=timeout)
         except Exception as e:
-            print(f"MJPEG: could not connect to {url} ({e})")
+            hint = ""
+            if "401" in str(e):
+                hint = (" - the camera wants a login: put it in the URL, e.g. "
+                        "http://USER:PASS@dans-ipad.local:8081/video, or turn the "
+                        "login off in the camera app's settings")
+            print(f"MJPEG: could not connect to {self.url} ({e}){hint}")
             self.resp = None
 
     def isOpened(self):
