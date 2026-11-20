@@ -160,6 +160,74 @@ def ensure_model():
         urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
 
 
+class MJPEGCapture:
+    """Minimal cv2.VideoCapture stand-in for an MJPEG-over-HTTP stream, e.g. an
+    iPad running IP Camera Lite (http://<ipad>.local:8081/video).
+
+    cv2.VideoCapture(url) on macOS can hand an http URL to AVFoundation, which
+    fails ("Couldn't read video stream from file"), and FFmpeg builds vary.
+    This reads the multipart stream directly - each frame is one JPEG between
+    the FF D8 / FF D9 markers - so it works with any OpenCV build and adds no
+    buffering of its own."""
+
+    def __init__(self, url, timeout=5.0):
+        import urllib.request
+        self.url = url
+        self.buf = b""
+        self.wh = (0, 0)
+        try:
+            self.resp = urllib.request.urlopen(url, timeout=timeout)
+        except Exception as e:
+            print(f"MJPEG: could not connect to {url} ({e})")
+            self.resp = None
+
+    def isOpened(self):
+        return self.resp is not None
+
+    def read(self):
+        if self.resp is None:
+            return False, None
+        try:
+            while True:
+                a = self.buf.find(b"\xff\xd8")
+                b = self.buf.find(b"\xff\xd9", a + 2) if a >= 0 else -1
+                if a >= 0 and b >= 0:
+                    jpg, self.buf = self.buf[a:b + 2], self.buf[b + 2:]
+                    f = cv2.imdecode(np.frombuffer(jpg, np.uint8), cv2.IMREAD_COLOR)
+                    if f is not None:
+                        self.wh = (f.shape[1], f.shape[0])
+                        return True, f
+                    continue
+                if a < 0:
+                    self.buf = self.buf[-1:]       # keep a possible half marker
+                chunk = self.resp.read(16384)
+                if not chunk:
+                    return False, None
+                self.buf += chunk
+                if len(self.buf) > 8_000_000:      # garbage, not MJPEG: resync
+                    self.buf = b""
+        except Exception:
+            return False, None
+
+    def set(self, *a):
+        return False
+
+    def get(self, prop):
+        if prop == cv2.CAP_PROP_FRAME_WIDTH:
+            return self.wh[0]
+        if prop == cv2.CAP_PROP_FRAME_HEIGHT:
+            return self.wh[1]
+        return 0
+
+    def release(self):
+        try:
+            if self.resp is not None:
+                self.resp.close()
+        except Exception:
+            pass
+        self.resp = None
+
+
 class CameraStream:
     """Reads a camera on its OWN thread and keeps only the newest frame.
 
@@ -192,6 +260,15 @@ class CameraStream:
         self._t.start()
 
     def _open(self):
+        if isinstance(self.src, str) and self.src.lower().startswith(("http://", "https://")):
+            # network stream: read MJPEG ourselves; fall back to FFmpeg for
+            # anything that is not MJPEG
+            cap = MJPEGCapture(self.src)
+            if cap.isOpened():
+                return cap
+            return cv2.VideoCapture(self.src, cv2.CAP_FFMPEG)
+        if isinstance(self.src, str):
+            return cv2.VideoCapture(self.src, cv2.CAP_FFMPEG)   # rtsp:// etc.
         cap = cv2.VideoCapture(self.src)
         w, h = self.wh
         if cap.isOpened() and w and h:
