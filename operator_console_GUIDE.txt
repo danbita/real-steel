@@ -17,8 +17,8 @@ Run these from the repo root, each in its own terminal:
        python "live mimic system/operator_console.py"
 
   3. A pose sender, one of:
-       python "live mimic system/pose_sender.py" --landmarks
-       python "dual camera setup/pose_sender_dual.py"
+       python "live mimic system/pose_sender.py" --landmarks          (1 camera)
+       python "live mimic system/pose_sender_stereo.py" --cams 0 1 2  (2-6 cameras)
      To test without a camera, use a video file:
        python "live mimic system/pose_sender.py" --landmarks --source clip2.mp4 --realtime
 
@@ -43,9 +43,10 @@ THE WINDOW
 
 Link line   e.g.  sender: landmarks | 30 pkt/s | last 12 ms ago   receiver: OK
     sender: what kind of data is arriving and how often.
-        "landmarks" = pose_sender.py --landmarks (full arm tracking).
-        "angles"    = older format (e.g. the dual-camera sender); shoulder
-                      twist is not tracked, so the arms won't rotate.
+        "landmarks" = pose_sender.py --landmarks or pose_sender_stereo.py
+                      (full arm tracking).
+        "angles"    = older format (pose_sender.py without --landmarks);
+                      shoulder twist is not tracked, so the arms won't rotate.
         red "no data" = nothing has arrived for over a second. Check the
                       sender is running and that it sees you.
     receiver: OK, or "not connected" if the receiver isn't running.
@@ -140,8 +141,8 @@ Left and right look swapped
     turning to face the camera usually fixes it.
 
 Twist rows never move
-    The sender is sending "angles" (e.g. the dual-camera sender), which
-    can't express twist. Use pose_sender.py --landmarks.
+    The sender is sending "angles", which can't express twist. Use
+    pose_sender.py --landmarks or pose_sender_stereo.py.
 
 Reading the plot
     Pick the joint that misbehaves. Target and actual close together =
@@ -161,7 +162,8 @@ TROUBLESHOOTING
                            already open - close it.
 "sender: no data"          Start a sender; check that its camera window shows
                            a skeleton. If it says SEARCHING, stand alone in
-                           view; press r in that window to re-search.
+                           view; press r in that window to re-search (p in
+                           the multi-camera window; r there re-aligns).
 Robot doesn't move but the link is green
                            The robot is STOPPED; press Space / RESUME.
 Arms move but never rotate The sender is sending "angles"; use

@@ -23,7 +23,8 @@ TELEM_PORT = 5006       # receiver -> console
 CMD_PORT = 5007         # console -> receiver
 MAX_DATAGRAM = 8192     # every message we send must fit in one of these
 
-MAX_RATE_MIN, MAX_RATE_MAX = 0.1, 3.0   # rad/s; 3.0 = STS3215 safe limit
+MAX_RATE_MIN, MAX_RATE_MAX = 0.1, 3.0   # rad/s; 3.0 = the receiver's MAX_RATE
+                                        # (servo_spec.MAX_RATE): never above it
 CONNECTED_S = 1.0       # telemetry older than this = receiver not connected
 
 

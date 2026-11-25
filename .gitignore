@@ -17,3 +17,9 @@ venv/
 
 # Atom demo deliverables ARE tracked
 !media/*.mp4
+
+# editor settings
+.vscode/
+
+# operator console recordings
+runs/

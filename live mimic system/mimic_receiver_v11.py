@@ -98,6 +98,14 @@ import importlib.util as _il
 _spec = _il.spec_from_file_location(
     "pose_sender", os.path.join(HERE, "pose_sender.py"))
 ps = _il.module_from_spec(_spec); _spec.loader.exec_module(ps)
+# operator console link (telemetry out on 5006, commands in on 5007). With no
+# console running this costs one small UDP send per 1/30 s and nothing else.
+_spec = _il.spec_from_file_location(
+    "console_link", os.path.join(HERE, "console_link.py"))
+_cl = _il.module_from_spec(_spec); _spec.loader.exec_module(_cl)
+TELEM_DT = 1.0 / 30.0   # s between telemetry packets (wall clock)
+GATED_SHOW_S = 0.3      # a gated joint stays flagged this long, so a 1-frame
+                        # rejection is still visible at the console's frame rate
 
 UDP_ADDR = ("127.0.0.1", 5005)
 SMOOTH_ALPHA = 0.35
@@ -247,7 +255,7 @@ PARKED = {"L_shoulder_twist": 0.0, "R_shoulder_twist": 0.0}
 def main():
     if not os.path.exists(SCENE):
         raise SystemExit(
-            f"scene not found: {SCENE}\nrun:  python sim/sim36/build_humanoid_v9_scene.py")
+            f"scene not found: {SCENE}\nrun:  python sim36/build_humanoid_v11_scene.py")
 
     model = mujoco.MjModel.from_xml_path(SCENE)
     if not PRETTY:
@@ -296,7 +304,21 @@ def main():
     dt = model.opt.timestep
     max_step = MAX_RATE * dt
 
+    # operator console state (see console_link.py); all of it is inert until
+    # a console sends a command
+    ctl = _cl.ControlState(MAX_RATE, gate is not None, recording=DUMP)
+    telem = _cl.TelemetryPublisher()
+    cmds = _cl.CommandListener()
+    limits_out = [[round(float(limits[n][0]), 4), round(float(limits[n][1]), 4)]
+                  for n in joints]
+    next_telem = 0.0
+    pkt_kind = None
+    gated_t = {}            # joint -> time.time() the gate last held it
+    rate_limited = set()    # joints the slew limiter held back this tick
+
     print(f"Listening on udp://{UDP_ADDR[0]}:{UDP_ADDR[1]}")
+    print(f"Operator console: telemetry -> udp {_cl.TELEM_PORT}, "
+          f"commands <- udp {_cl.CMD_PORT}")
     print("Physics ON: position actuators + mj_step.")
     print("Shoulder v6: pitch +/-90, roll -10..150, twist +/-90, elbow 0..120.")
     print(f"Rest roll = {REST_ROLL:.4f} rad (arm hanging); abduction adds to it.")
@@ -343,6 +365,7 @@ def main():
         npkt = 0
         rec = [] if DUMP else None
         solves = [] if DUMP else None
+        rec_path = DUMP
         next_rec = 0.0
         next_sync = 0.0
         next_synth = 0.0
@@ -354,6 +377,36 @@ def main():
         while viewer.is_running():
             now = time.time()
             win["loops"] += 1
+            # ---------------- 0. operator console commands -----------------
+            for c in cmds.poll():
+                for ev, val in ctl.apply(c):
+                    if ev == "stopped" and val:
+                        # freeze exactly where the robot is commanded now
+                        target.update(cmd)
+                        print("console: STOP - holding position, ignoring poses",
+                              flush=True)
+                    elif ev == "stopped":
+                        # filters and gate hold pre-stop history: start clean,
+                        # the slew limiter carries the robot back to the pose
+                        jfilt.clear()
+                        if gate is not None:
+                            gate.load(None)
+                        print("console: RESUME", flush=True)
+                    elif ev == "max_rate":
+                        max_step = val * dt
+                        print(f"console: max rate {val:.2f} rad/s", flush=True)
+                    elif ev == "gate":
+                        gate = StepGate() if val else None
+                        print(f"console: glitch gate {'ON' if val else 'OFF'}",
+                              flush=True)
+                    elif ev == "record_start":
+                        rec, solves, rec_path = [], [], val
+                        next_rec = data.time
+                        print(f"console: recording -> {val}", flush=True)
+                    elif ev == "record_stop":
+                        save_dump(val, joints, rec, solves, npkt)
+                        rec = solves = rec_path = None
+
             # ---------------- 1. network: keep only the NEWEST packet -------
             newest_lm, newest_ang = None, None
             while True:
@@ -384,6 +437,13 @@ def main():
                 W, _vis = synth.pose(now - wall0)
                 newest_lm = {"world": W.tolist(), "hips_ok": True, "i": -1}
                 next_synth = now + SYNTH_DT
+            if newest_lm is not None:
+                pkt_kind = "landmarks"
+            elif newest_ang is not None:
+                pkt_kind = "angles"
+            if ctl.stopped:
+                # STOP: the socket was drained above, apply nothing
+                newest_lm = newest_ang = None
 
             if newest_lm is not None:
                 # RAW LANDMARK PACKET (pose_sender.py --landmarks, or the
@@ -401,6 +461,10 @@ def main():
                 win["res"] = max(win["res"], float(ik.last_res))
                 use_q, _gstep, _nrej = ((raw_q, 0.0, 0) if gate is None
                                         else gate.filter(raw_q))
+                if _nrej:
+                    for k in raw_q:
+                        if k not in use_q:
+                            gated_t[k] = now
                 if solves is not None:
                     solves.append({"t": now - wall0,
                                    "npkt": npkt,
@@ -452,9 +516,13 @@ def main():
                 # robot follows you NOW instead of replaying the past in slow-mo
                 sim_off += behind - SYNC_DT
                 win["skips"] += 1
+            rate_limited = set()
             while data.time - sim_off < wall_t:
                 for name in joints:
-                    delta = max(-max_step, min(max_step, target[name] - cmd[name]))
+                    want = target[name] - cmd[name]
+                    if abs(want) > max_step:
+                        rate_limited.add(name)
+                    delta = max(-max_step, min(max_step, want))
                     cmd[name] += delta
                     data.ctrl[act[name]] = cmd[name]
                 mujoco.mj_step(model, data)
@@ -474,6 +542,27 @@ def main():
             if now >= next_sync:
                 viewer.sync()
                 next_sync = now + SYNC_DT
+
+            # ---------------- 3b. telemetry to the operator console --------
+            if now >= next_telem:
+                next_telem = now + TELEM_DT
+                telem.send({
+                    "type": "telemetry", "t": round(data.time, 3),
+                    "joints": joints, "limits": limits_out,
+                    "target": [round(float(target[n]), 4) for n in joints],
+                    "qpos": [round(float(data.qpos[qadr[n]]), 4) for n in joints],
+                    "rate_limited": sorted(rate_limited),
+                    "gated": [k for k, t_ in gated_t.items()
+                              if now - t_ < GATED_SHOW_S],
+                    "npkt": npkt,
+                    "pkt_age": (None if last_pkt_wall is None
+                                else round(now - last_pkt_wall, 3)),
+                    "pkt_kind": pkt_kind,
+                    "stopped": ctl.stopped,
+                    "max_rate": ctl.max_rate,
+                    "gate_on": gate is not None,
+                    "recording": rec_path,
+                })
 
             # ---------------- 4. status line ---------------------------------
             el = now - win["t"]
@@ -530,20 +619,28 @@ def main():
                 except (OSError, ValueError):
                     time.sleep(wait)
 
-    if rec:
-        blob = {"t": _np.array([r["t"] for r in rec]),
-                "npkt": _np.array([r["npkt"] for r in rec]),
-                "qpos": _np.array([r["qpos"] for r in rec]),
-                "cmd": _np.array([r["cmd"] for r in rec]),
-                "target": _np.array([r["target"] for r in rec]),
-                "joints": _np.array(joints),
-                "solve_keys": _np.array(sorted(solves[0]) if solves else []),
-                "solves": _np.array([[s_[k] for k in sorted(solves[0])]
-                                     for s_ in solves]) if solves else _np.zeros((0, 0))}
-        os.makedirs(os.path.dirname(os.path.abspath(DUMP)), exist_ok=True)
-        _np.savez_compressed(DUMP, **blob)
-        print(f"receiver dump -> {DUMP}  ({len(rec)} ticks, "
-              f"{len(solves or [])} IK solves, {npkt} packets)", flush=True)
+    if rec_path is not None:
+        save_dump(rec_path, joints, rec, solves, npkt)
+
+
+def save_dump(path, joints, rec, solves, npkt):
+    """Write a recording (--dump, or the console's Record button) as npz."""
+    if not rec:
+        print(f"receiver dump: nothing recorded, {path} not written", flush=True)
+        return
+    blob = {"t": _np.array([r["t"] for r in rec]),
+            "npkt": _np.array([r["npkt"] for r in rec]),
+            "qpos": _np.array([r["qpos"] for r in rec]),
+            "cmd": _np.array([r["cmd"] for r in rec]),
+            "target": _np.array([r["target"] for r in rec]),
+            "joints": _np.array(joints),
+            "solve_keys": _np.array(sorted(solves[0]) if solves else []),
+            "solves": _np.array([[s_[k] for k in sorted(solves[0])]
+                                 for s_ in solves]) if solves else _np.zeros((0, 0))}
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    _np.savez_compressed(path, **blob)
+    print(f"receiver dump -> {path}  ({len(rec)} ticks, "
+          f"{len(solves or [])} IK solves, {npkt} packets)", flush=True)
 
 
 # ---------------------------------------------------------------------------
