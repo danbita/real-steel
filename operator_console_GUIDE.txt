@@ -1,0 +1,168 @@
+OPERATOR CONSOLE - USER GUIDE
+=============================
+
+The operator console is a small window for watching and controlling the
+robot while it mimics you. It works with any pose sender (1, 2 or 3 cameras)
+because it only talks to the receiver. Camera video and the tracking skeleton
+stay in the sender's own window, as before.
+
+STARTING IT
+-----------
+Run these from the repo root, each in its own terminal:
+
+  1. Receiver (the robot / simulation):
+       python "live mimic system/mimic_receiver_v11.py"
+
+  2. Console:
+       python "live mimic system/operator_console.py"
+
+  3. A pose sender, one of:
+       python "live mimic system/pose_sender.py" --landmarks
+       python "dual camera setup/pose_sender_dual.py"
+     To test without a camera, use a video file:
+       python "live mimic system/pose_sender.py" --landmarks --source clip2.mp4 --realtime
+
+Start them in any order: the console waits and connects by itself.
+Closing the console never affects the robot. Everything keeps running
+without it.
+
+
+THE WINDOW
+----------
+
+[ STOP ]  /  [ RESUME ]          (keyboard: Space)
+    STOP freezes the robot exactly where it is and ignores your movements.
+    RESUME goes back to mimicking. The robot moves back to your pose at its
+    normal speed limit, so it won't snap.
+    Use STOP the moment anything looks wrong. While stopped, the button
+    turns green and reads RESUME.
+    Space only works while the CONSOLE window is the active window. (In the
+    MuJoCo window, Space pauses the simulation instead.)
+    This is a software stop over the network. It does NOT replace a
+    physical emergency stop that cuts servo power on the real robot.
+
+Link line   e.g.  sender: landmarks | 30 pkt/s | last 12 ms ago   receiver: OK
+    sender: what kind of data is arriving and how often.
+        "landmarks" = pose_sender.py --landmarks (full arm tracking).
+        "angles"    = older format (e.g. the dual-camera sender); shoulder
+                      twist is not tracked, so the arms won't rotate.
+        red "no data" = nothing has arrived for over a second. Check the
+                      sender is running and that it sees you.
+    receiver: OK, or "not connected" if the receiver isn't running.
+
+Joint bars   (one row per arm joint: L/R shoulder pitch, roll, twist, elbow)
+    Each bar is the joint's full allowed range; the tick marks 0 deg
+    (0 = arm hanging straight down, elbow straight).
+    The two numbers are degrees: target, then actual.
+        white ring = where your pose is asking the joint to go (target).
+                     This is your pose after the receiver has converted it
+                     to robot joint angles, smoothed it, run it through the
+                     glitch filter, and clamped it to the joint's range.
+        blue dot   = where the robot joint actually is
+    Normally the two move together, a little apart.
+    Row colours:
+        amber = the speed limit is holding this joint back (you moved
+                faster than the servo is allowed to)
+        red   = the glitch filter just rejected a sudden jump on this joint
+                (only with the glitch filter on, and only for "landmarks")
+    How to read it:
+        target wrong (jumps around, wrong place)  -> tracking problem
+        target fine but robot can't follow / sits at the end of the bar
+                                                  -> speed limit or joint limit
+
+Live plot
+    Pick a joint from the dropdown. Shows target and actual over the last
+    ~10 seconds. Shaky lines = jitter; a gap between them = lag; a spike =
+    a tracking glitch.
+
+Max speed (rad/s)
+    How fast any joint may move. Default and maximum is 3.0, the real
+    servo's safe limit. Lower = smoother but laggier. Takes effect when you
+    let go of the slider.
+
+Glitch filter
+    On/off. When on, a joint isn't allowed to jump further in one frame
+    than a human could: a short jump is ignored, a lasting one is accepted
+    after a few frames. Try it on if you see sudden flicks.
+
+    Max speed and the glitch filter go back to their defaults (or to the
+    receiver's --gate flag) when the receiver restarts.
+
+[ Record ]
+    Press to start and press again to stop. Saves what the robot was told
+    to do and what it actually did to runs/<date-time>.npz (same format as
+    the receiver's --dump). Record whenever you're trying to catch a glitch,
+    then pass the file on with a note of roughly when it happened.
+    If the receiver was started with --dump, it is already recording to
+    that file and the button shows "Stop recording".
+    To watch a recording again:
+        python sim36/replay_dump.py runs/<file>.npz                (3D window)
+        python sim36/replay_dump.py runs/<file>.npz --mp4 out.mp4  (video file)
+
+
+INTERPRETING WHAT YOU SEE
+-------------------------
+Work from left to right through the system: is data arriving (link line),
+is the target right (white ring), and is the robot following it (blue dot)?
+
+Healthy
+    Link line green, ~30 pkt/s, "last" well under 100 ms. Rings follow your
+    arms smoothly, dots trail just behind, rows mostly uncoloured. A short
+    amber flash during a fast punch is normal.
+
+Ring jumps or shakes while you hold still
+    The tracking is noisy, not the robot. Check the sender's camera window:
+    poor lighting, a limb out of view or hidden behind your body, or loose
+    clothing. In the plot this looks like a jagged target line.
+
+Ring flicks to a wrong position for a moment, then comes back
+    A tracking glitch. Turn the glitch filter on; flicks should then show
+    as brief red rows and the robot should barely move.
+
+Ring sits pinned at one end of the bar
+    Your pose asks for more than that joint can do, so the target is
+    clamped to its limit. Common example: crossing your arms in front of
+    your chest asks the shoulder roll for more than its -10 deg. That is a
+    limit of the robot's design, not a bug.
+
+Ring is right but the dot lags behind it, row amber
+    The speed limit is holding the joint back: you moved faster than the
+    servo is allowed to. Expected for fast moves. If it's amber all the
+    time while moving slowly, check that Max speed hasn't been turned down.
+
+Ring is right, dot is far away and NOT amber
+    The joint isn't reaching its target even though it isn't speed-limited:
+    something is in the way (a collision, or the arm's weight). Look at the
+    robot in the MuJoCo window. Worth recording and reporting.
+
+Left and right look swapped
+    The tracker mixed up your left and right. Check the sender's window;
+    turning to face the camera usually fixes it.
+
+Twist rows never move
+    The sender is sending "angles" (e.g. the dual-camera sender), which
+    can't express twist. Use pose_sender.py --landmarks.
+
+Reading the plot
+    Pick the joint that misbehaves. Target and actual close together =
+    good. Actual a steady distance behind target = lag (a small, steady
+    delay is normal). Actual cutting corners on a fast move = speed
+    limit. A spike in target only = a tracking glitch.
+
+When in doubt, press Record, repeat the movement, stop recording, and pass
+the file on with a note of what you did and what looked wrong.
+
+
+TROUBLESHOOTING
+---------------
+"receiver: not connected"  Start the receiver; check its terminal for errors
+                           (e.g. "scene not found"). If the console printed
+                           "cannot listen ... 5006", another console is
+                           already open - close it.
+"sender: no data"          Start a sender; check that its camera window shows
+                           a skeleton. If it says SEARCHING, stand alone in
+                           view; press r in that window to re-search.
+Robot doesn't move but the link is green
+                           The robot is STOPPED; press Space / RESUME.
+Arms move but never rotate The sender is sending "angles"; use
+                           pose_sender.py --landmarks for full tracking.
